@@ -5,6 +5,7 @@ import MLJBase: @mlj_model, metadata_pkg, metadata_model
 import Soss
 import Soss: @model, predictive, Univariate, Continuous, dynamicHMC
 using Parameters
+using LinearAlgebra
 import Distributions
 
 @with_kw_noshow mutable struct BayesianRidgeRegressor <: MLJBase.Probabilistic
@@ -20,13 +21,15 @@ end
 
 function _model(brr::BayesianRidgeRegressor)
     if brr.fit_intercept
-        error("not supported yet")
-    else
-        mdl = @model X begin
+        mdl = @model (X, Σ) begin
             θ ~ Normal() |> iid(size(X, 2))
-            y ~ For(eachrow(X)) do x
-                Normal(x'θ, 1)
-            end
+            b ~ Normal()
+            y ~ MvNormal(X*θ .+ b, I)
+        end
+    else
+        mdl = @model (X, Σ) begin
+            θ ~ Normal() |> iid(size(X, 2))
+            y ~ MvNormal(X*θ, Σ)
         end
     end
     return mdl
@@ -37,22 +40,21 @@ function MLJBase.fit(brr::BayesianRidgeRegressor, verb::Int, X, y)
     Xm = MLJBase.matrix(X)
     mdl = _model(brr)
     # fit the model
-    res = dynamicHMC(mdl(X=Xm), (y=y,))
+    res = dynamicHMC(mdl(X=Xm, Σ=diagm(ones(size(Xm, 1)))), (y=y,))
     cache = nothing
     report = NamedTuple{}()
     ((mdl, res), cache, report)
 end
 
 function MLJBase.predict(::BayesianRidgeRegressor, (mdl, res), Xnew)
-    pred = predictive(mdl, setdiff(variables(mdl), (:X,  :y))...)
+    pred = predictive(mdl, setdiff(variables(mdl), [:X,  :y])...)
     map(eachrow(Xnew)) do x
         BayesianRidgeRegressorPred(pred, x', res)
     end
 end
 
 function Base.rand(p::BayesianRidgeRegressorPred)
-    args = merge(rand(p.θ), (X=p.Xrow,))
-    rand(p.pred(args)).y
+    rand(p.pred(X=p.Xrow, Σ=1)).y
 end
 
 ##########
