@@ -32,7 +32,7 @@ function _model(brr::BayesianRidgeRegressor)
         mdl = @model X begin
             θ ~ Normal() |> iid(size(X, 2))
             yhat = X*θ
-            y ~ For(length(yhat)) do j
+            y ~ For(eachindex(yhat)) do j
                 Normal(yhat[j],1)
             end
         end
