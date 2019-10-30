@@ -6,7 +6,7 @@ import Soss
 import Soss: @model, predictive, Univariate, Continuous, dynamicHMC
 using Parameters
 using LinearAlgebra
-import Distributions
+using Distributions
 
 @with_kw_noshow mutable struct BayesianRidgeRegressor <: MLJBase.Probabilistic
     fit_intercept::Bool = true
@@ -21,15 +21,20 @@ end
 
 function _model(brr::BayesianRidgeRegressor)
     if brr.fit_intercept
-        mdl = @model (X, Σ) begin
+        mdl = @model X begin
             θ ~ Normal() |> iid(size(X, 2))
-            b ~ Normal()
-            y ~ MvNormal(X*θ .+ b, I)
+            yhat = X*θ
+            y ~ For(length(yhat)) do j
+                Normal(yhat[j],1)
+            end
         end
     else
-        mdl = @model (X, Σ) begin
+        mdl = @model X begin
             θ ~ Normal() |> iid(size(X, 2))
-            y ~ MvNormal(X*θ, Σ)
+            yhat = X*θ
+            y ~ For(length(yhat)) do j
+                Normal(yhat[j],1)
+            end
         end
     end
     return mdl
@@ -40,7 +45,7 @@ function MLJBase.fit(brr::BayesianRidgeRegressor, verb::Int, X, y)
     Xm = MLJBase.matrix(X)
     mdl = _model(brr)
     # fit the model
-    res = dynamicHMC(mdl(X=Xm, Σ=diagm(ones(size(Xm, 1)))), (y=y,))
+    res = dynamicHMC(mdl(X=Xm), (y=y,))
     cache = nothing
     report = NamedTuple{}()
     ((mdl, res), cache, report)
@@ -59,9 +64,9 @@ end
 
 ##########
 
-X = randn(500, 10)
-θ = randn(10)
-y = X * θ + randn(500)
+X = randn(500, 10);
+θ = randn(10);
+y = X * θ + randn(500);
 
 brr = BayesianRidgeRegressor(; fit_intercept=false)
 
