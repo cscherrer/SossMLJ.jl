@@ -45,7 +45,7 @@ function MLJBase.fit(brr::BayesianRidgeRegressor, verb::Int, X, y)
     Xm = MLJBase.matrix(X)
     mdl = _model(brr)
     # fit the model
-    res = dynamicHMC(mdl(X=Xm), (y=y,))
+    res = dynamicHMC(mdl(X=Xm), (y=y,)) |> Soss.particles
     cache = nothing
     report = NamedTuple{}()
     ((mdl, res), cache, report)
