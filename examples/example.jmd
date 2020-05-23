@@ -28,10 +28,10 @@ sm = SossModel(model=m)
 
 Let's get some fake data to try it out.
 
-```julia
+```julia; results="hidden"
 X = rand(Cauchy(),(10,2))
 
-truth = rand(m(X=X));
+truth = rand(m(X=X))
 ```
 
 This gives us the parameter value
