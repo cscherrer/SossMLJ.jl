@@ -10,7 +10,7 @@ using Soss
 
 Now we make a Soss model
 
-```julia
+```julia; results="hidden"
 m = @model X begin
     β ~ Cauchy() |> iid(2)
     yhat = X * β
@@ -32,9 +32,17 @@ Let's get some fake data to try it out.
 X = rand(Cauchy(),(10,2))
 
 truth = rand(m(X=X));
+```
 
+This gives us the parameter value
+
+```julia
 truth.β
+```
 
+and response vector
+
+```julia
 truth.y
 ```
 
@@ -48,7 +56,7 @@ fit!(mach)
 And now for prediciton! Note that this is a probabilistic model, so `MLJ.predict` gives us a vector of sampleable results:
 
 ```julia
-pred = MLJ.predict(mach, matrix(X));
+pred = MLJ.predict(mach, X);
 rand.(pred)
 ```
 
