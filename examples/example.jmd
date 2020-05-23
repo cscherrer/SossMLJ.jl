@@ -1,0 +1,59 @@
+Loading some things
+
+```julia
+import MLJModelInterface: matrix
+using MLJ
+using SossMLJ
+using DataFrames
+using Soss  
+```
+
+Now we make a Soss model
+
+```julia
+m = @model X begin
+    β ~ Cauchy() |> iid(2)
+    yhat = X * β
+    y ~ For(length(yhat)) do j
+        Normal(yhat[j], 1)
+    end
+end
+```
+
+next we wrap this in a `SossModel` (note no space), which connects us to MLJ.
+
+```julia
+sm = SossModel(model=m)
+```
+
+Let's get some fake data to try it out.
+
+```julia
+X = rand(Cauchy(),(10,2))
+
+truth = rand(m(X=X));
+
+truth.β
+
+truth.y
+```
+
+Now we create and fit a machine:
+
+```julia; results="hidden"
+mach = machine(sm, X, truth.y)
+fit!(mach)
+```
+
+And now for prediciton! Note that this is a probabilistic model, so `MLJ.predict` gives us a vector of sampleable results:
+
+```julia
+pred = MLJ.predict(mach, matrix(X));
+rand.(pred)
+```
+
+And here's another sample:
+
+```julia
+rand.(pred)
+```
