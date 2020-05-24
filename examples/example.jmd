@@ -23,7 +23,7 @@ end
 next we wrap this in a `SossModel` (note no space), which connects us to MLJ.
 
 ```julia
-sm = SossModel(model=m)
+sm = SossMLJModel(model=m)
 ```
 
 Let's get some fake data to try it out.
