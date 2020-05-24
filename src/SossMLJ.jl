@@ -27,30 +27,33 @@ end
 
 export SossMLJModel
 
-mutable struct SossMLJModel{A,B,M} <: MLJModelInterface.Probabilistic
-    model::Model{A,B,M}
+# TODO: Should the user instead specify a `prior` and `likelihood`?
+
+mutable struct SossMLJModel{M,I} <: MLJModelInterface.Probabilistic
+    model :: M
+    infer :: I
 end
 
-function SossMLJModel(; model = m0)
-    model = SossMLJModel(model)
-    message = MLJModelInterface.clean!(model)
-    return model
+function SossMLJModel(; model = m0, infer=dynamicHMC)
+    smm = SossMLJModel(model, infer)
+    message = MLJModelInterface.clean!(smm)
+    return smm
 end
 
 
-function MLJModelInterface.clean!(model::SossMLJModel)
+function MLJModelInterface.clean!(smm::SossMLJModel)
     warning = ""
     return warning
 end
 
-struct SossPredictor{A,B,M} <: Distributions.Sampleable{Univariate,Continuous}
-    model :: Model{A,B,M}
-    post
+struct SossPredictor{M} <: Distributions.Sampleable{Univariate,Continuous}
+    model :: M
+    post 
     xrow
 end
 
 
-function Base.rand(sp::SossPredictor{A,B,M}) where {A,B,M}
+function Base.rand(sp::SossPredictor{M}) where {M}
     par = rand(sp.post)
     X = reshape(sp.xrow, (1,:))
     args = merge(par, (X=X,))
@@ -62,8 +65,7 @@ function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
     
     jd = sm.model(X=X)
 
-    # TODO: Specify inference method in SossMLJModel
-    post = dynamicHMC(jd, (y=y,))
+    post = sm.infer(jd, (y=y,))
 
     # TODO: Allow w to be included
 
