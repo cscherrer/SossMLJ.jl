@@ -10,6 +10,7 @@ makedocs(;
     sitename="SossMLJ.jl",
     authors="Chad Scherrer",
     assets=String[],
+    strict=true,
 )
 
 deploydocs(;
