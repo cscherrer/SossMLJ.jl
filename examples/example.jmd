@@ -20,7 +20,7 @@ m = @model X begin
 end
 ```
 
-next we wrap this in a `SossModel` (note no space), which connects us to MLJ.
+next we wrap this in a `SossMLJModel`, which connects us to MLJ.
 
 ```julia
 sm = SossMLJModel(model=m)
