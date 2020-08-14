@@ -58,12 +58,16 @@ jobs:
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1'
-      - run: |
+      - env:
+          PYTHON: ''
+        run: |
           julia --project=docs -e '
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
-      - run: |
+      - env:
+          PYTHON: ''
+        run: |
           julia --project=docs -e '
             using Documenter: doctest
             using SossMLJ
@@ -72,3 +76,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+          PYTHON: ''
