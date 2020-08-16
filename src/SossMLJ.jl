@@ -7,15 +7,21 @@ const MMI = MLJModelInterface
 
 using Soss
 import Soss: Model, @model, predictive, Univariate, Continuous, dynamicHMC
-using Distributions
+import Distributions
 import Base
 
+const Dists = Distributions
+
+
+
+
 # Just a placeholder
-m0 = @model X begin
-    β ~ Normal()
+m0 = @model X,α,σ begin
+    k = size(X,2)
+    β ~ Normal(0,α) |> iid(k)
     yhat = X * β
-    y ~ For(size(yhat)) do j
-        Normal(yhat[j], 1)
+    y ~ For(eachindex(yhat)) do j
+        Normal(yhat[j], σ)
     end
 end
 
@@ -31,13 +37,15 @@ export SossMLJModel
 
 # TODO: Should the user instead specify a `prior` and `likelihood`?
 
-mutable struct SossMLJModel{M,I} <: MLJModelInterface.Probabilistic
+mutable struct SossMLJModel{H,T,M,I} <: MLJModelInterface.Probabilistic
+    hyperparams :: H
+    transform :: T
     model :: M
     infer :: I
 end
 
 function SossMLJModel(; model = m0, infer=dynamicHMC)
-    smm = SossMLJModel(model, infer)
+    smm = SossMLJModel(hyperparams, transform, model, infer)
     message = MLJModelInterface.clean!(smm)
     return smm
 end
@@ -48,10 +56,14 @@ function MLJModelInterface.clean!(smm::SossMLJModel)
     return warning
 end
 
-struct SossPredictor{M} <: Distributions.Sampleable{Univariate,Continuous}
+struct MixedVariate <: Dists.VariateForm end
+struct MixedSupport <: Dists.ValueSupport end
+
+struct SossMLJPredictor{M} <: Distributions.Sampleable{MixedVariate, MixedSupport}
     model :: M
     post 
-    xrow
+    pred
+    X
 end
 
 
@@ -65,7 +77,7 @@ end
 function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
     # construct the model
     
-    jd = sm.model(X=X)
+    jd = sm.model(merge(sm.hyperparams, transform(X)))
 
     post = sm.infer(jd, (y=y,))
 
@@ -75,7 +87,7 @@ function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
     report = NamedTuple{}()
 
     newargs = setdiff(sampled(jd.model),(:y,))
-    m = predictive(jd.model, newargs...)
+    pred = predictive(jd.model, newargs...)
     ((model=m, post=post), cache, report)
 end
 
