@@ -9,6 +9,7 @@ MLJModelInterface = "e80e1ace-859a-464e-9ed9-23947d8ae3ea"
 Soss = "8ce77f84-9b61-11e8-39ff-d17a774bf41c"
 
 [compat]
+Distributions = "0.23"
 MLJModelInterface = "0.3"
 julia = "1.3"
 
