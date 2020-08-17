@@ -9,6 +9,7 @@ using Soss
 import Soss: Model, @model, predictive, Univariate, Continuous, dynamicHMC
 import Distributions
 import Base
+import Tables
 
 const Dists = Distributions
 
@@ -63,21 +64,21 @@ struct SossMLJPredictor{M} <: Distributions.Sampleable{MixedVariate, MixedSuppor
     model :: M
     post 
     pred
-    X
+    args
 end
 
 
-function Base.rand(sp::SossPredictor{M}) where {M}
-    par = rand(sp.post)
-    X = reshape(sp.xrow, (1,:))
-    args = merge(par, (X=X,))
-    return rand(sp.model(args)).y[1]
+function Base.rand(sp::SossMLJPredictor{M}) where {M}
+    pars = rand(sp.post)
+    args = merge(sp.args, pars)
+    return rand(sp.pred(args)).y[1]
 end
 
 function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
     # construct the model
-    
-    jd = sm.model(merge(sm.hyperparams, transform(X)))
+    args = merge(sm.transform(X), sm.hyperparams)
+
+    jd = sm.model(args)
 
     post = sm.infer(jd, (y=y,))
 
@@ -88,15 +89,19 @@ function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
 
     newargs = setdiff(sampled(jd.model),(:y,))
     pred = predictive(jd.model, newargs...)
-    ((model=m, post=post), cache, report)
+    ((model=sm, post=post), cache, report)
 end
 
 function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
-    m = fitresult.model
+    m = sm.model
     post = fitresult.post
-    
-    map(eachrow(Xnew)) do x
-        SossPredictor(m, post, x)
+    pred = predictive(m, keys(post[1])...)
+
+    # predictor = SossPredictor(sm, post, pred, Xnew)
+
+    map(Tables.rowtable(Xnew)) do xrow
+        args = merge(sm.transform([xrow]), sm.hyperparams)
+        SossMLJPredictor(sm, post, pred, args)
     end
 end
 
