@@ -105,4 +105,14 @@ function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
     end
 end
 
+function MMI.predict_joint(sm::SossMLJModel, fitresult, Xnew)
+    m = sm.model
+    post = fitresult.post
+    pred = predictive(m, keys(post[1])...)
+    args = merge(sm.transform(Xnew), sm.hyperparams)
+    return SossPredictor(sm, post, pred, args)
+end
+
+
+
 end # module
