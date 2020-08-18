@@ -97,12 +97,19 @@ function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
     post = fitresult.post
     pred = predictive(m, keys(post[1])...)
 
-    # predictor = SossPredictor(sm, post, pred, Xnew)
-
     map(Tables.rowtable(Xnew)) do xrow
         args = merge(sm.transform([xrow]), sm.hyperparams)
         SossMLJPredictor(sm, post, pred, args)
     end
+end
+
+# function MMI.predict_joint(sm::SossMLJModel, fitresult, Xnew)
+function predict_joint(sm::SossMLJModel, fitresult, Xnew)
+    m = sm.model
+    post = fitresult.post
+    pred = predictive(m, keys(post[1])...)
+    args = merge(sm.transform(Xnew), sm.hyperparams)
+    return SossMLJPredictor(sm, post, pred, args)
 end
 
 end # module
