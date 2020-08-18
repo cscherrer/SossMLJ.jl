@@ -96,9 +96,7 @@ function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
     m = sm.model
     post = fitresult.post
     pred = predictive(m, keys(post[1])...)
-
-    # predictor = SossPredictor(sm, post, pred, Xnew)
-
+    
     map(Tables.rowtable(Xnew)) do xrow
         args = merge(sm.transform([xrow]), sm.hyperparams)
         SossMLJPredictor(sm, post, pred, args)
