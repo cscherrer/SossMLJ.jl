@@ -3,6 +3,7 @@ __precompile__(false) # TODO: enable precompilation for this package
 module SossMLJ
 
 import Distributions
+import Distributions: logpdf
 import Soss
 import Soss: Model, @model, predictive, Univariate, Continuous, dynamicHMC
 import MLJBase # TODO: remove the dependency on MLJBase.jl
