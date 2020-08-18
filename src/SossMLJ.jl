@@ -109,7 +109,7 @@ function predict_joint(sm::SossMLJModel, fitresult, Xnew)
     post = fitresult.post
     pred = predictive(m, keys(post[1])...)
     args = merge(sm.transform(Xnew), sm.hyperparams)
-    return SossPredictor(sm, post, pred, args)
+    return SossMLJPredictor(sm, post, pred, args)
 end
 
 end # module
