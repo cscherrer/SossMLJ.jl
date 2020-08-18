@@ -29,7 +29,7 @@ end
 # TODO: Add an way to specify which variable is observed, and which is predicted
 # e.g. even if we observe `y`, we might sometimes prefer to predict yhat
 
-# @mlj_model mutable struct SossMLJModel <: MMI.Probabilistic
+# @mlj_model mutable struct SossMLJModel <: MMI.JointProbabilistic
 #     model :: Model = m0
 # end
 
@@ -38,6 +38,7 @@ export SossMLJModel
 
 # TODO: Should the user instead specify a `prior` and `likelihood`?
 
+# mutable struct SossMLJModel{H,T,M,I} <: MLJModelInterface.JointProbabilistic
 mutable struct SossMLJModel{H,T,M,I} <: MLJModelInterface.Probabilistic
     hyperparams :: H
     transform :: T
