@@ -34,3 +34,5 @@ rand.(predictor_marginal)
 # predictor_joint = MLJ.predict_joint(mach, X)
 predictor_joint = SossMLJ.predict_joint(mach, X)
 rand(predictor_joint)
+
+logpdf(predictor_joint, rand(predictor_joint))
