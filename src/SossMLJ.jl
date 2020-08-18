@@ -93,7 +93,7 @@ function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
     cache = nothing
     report = NamedTuple{}()
 
-    newargs = setdiff(sampled(jd.model),(:y,))
+    newargs = setdiff(Soss.sampled(jd.model),(:y,))
     pred = predictive(jd.model, newargs...)
     ((model=sm, post=post), cache, report)
 end
