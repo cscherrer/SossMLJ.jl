@@ -9,6 +9,7 @@ MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 MLJModelInterface = "e80e1ace-859a-464e-9ed9-23947d8ae3ea"
 MonteCarloMeasurements = "0987c9cc-fe09-11e8-30f0-b96dd679fdca"
 Soss = "8ce77f84-9b61-11e8-39ff-d17a774bf41c"
+StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 
 [compat]
