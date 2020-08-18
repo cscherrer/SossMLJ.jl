@@ -1,8 +1,9 @@
-import MLJModelInterface: matrix
 using MLJ
+using MLJModelInterface
+using Soss
 using SossMLJ
-using DataFrames
-using Soss  
+
+const MMI = MLJModelInterface
 
 m = @model X begin
     β ~ Cauchy() |> iid(2)
@@ -25,6 +26,6 @@ truth.y
 mach = machine(sm, X, truth.y)
 fit!(mach)
 
-pred = MLJ.predict(mach, matrix(X));
+pred = MLJ.predict(mach, MMI.matrix(X));
 
 rand.(pred)

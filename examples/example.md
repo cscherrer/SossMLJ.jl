@@ -1,11 +1,12 @@
 Loading some things
 
 ````julia
-import MLJModelInterface: matrix
 using MLJ
-using SossMLJ
-using DataFrames
+using MLJModelInterface
 using Soss
+using SossMLJ
+
+const MMI = MLJModelInterface
 ````
 
 
@@ -163,5 +164,3 @@ rand.(pred)
  -4.306828782379904
  -1.4862297043387542
 ````
-
-

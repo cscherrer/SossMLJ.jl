@@ -1,7 +1,8 @@
-using Soss
 using MLJ
-using SossMLJ
 using MLJModelInterface
+using Soss
+using SossMLJ
+
 const MMI = MLJModelInterface
 
 m = @model X,α,σ begin
@@ -17,7 +18,6 @@ X = (a=randn(10), b=randn(10), c=randn(10))
 
 params = (α=2.0, σ=1.0)
 
-
 mdl = SossMLJ.SossMLJModel(params, X -> (X=MMI.matrix(X),), m, dynamicHMC)
 
 args = merge(mdl.transform(X), params)
@@ -28,9 +28,9 @@ y = truth.y
 mach = machine(mdl, X, y)
 fit!(mach)
 
+predictor_marginal = MLJ.predict(mach, X)
+rand.(predictor_marginal)
 
-predictor = MLJ.predict(mach, X)
-
-rand.(predictor)
-
-
+# predictor_joint = MLJ.predict_joint(mach, X)
+predictor_joint = SossMLJ.predict_joint(mach, X)
+rand(predictor_joint)

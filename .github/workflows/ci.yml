@@ -42,6 +42,7 @@ jobs:
             ${{ runner.os }}-
       - uses: julia-actions/julia-buildpkg@latest
         env:
+          JULIA_PKG_SERVER: ''
           PYTHON: ''
       - uses: julia-actions/julia-runtest@latest
         env:
@@ -59,6 +60,7 @@ jobs:
         with:
           version: '1'
       - env:
+          JULIA_PKG_SERVER: ''
           PYTHON: ''
         run: |
           julia --project=docs -e '

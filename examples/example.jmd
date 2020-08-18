@@ -1,11 +1,12 @@
 Loading some things
 
 ```julia
-import MLJModelInterface: matrix
 using MLJ
+using MLJModelInterface
+using Soss
 using SossMLJ
-using DataFrames
-using Soss  
+
+const MMI = MLJModelInterface
 ```
 
 Now we make a Soss model
