@@ -3,6 +3,7 @@ __precompile__(false) # TODO: enable precompilation for this package
 module SossMLJ
 
 import Distributions
+import Distributions: logpdf
 import Soss
 import Soss: Model, @model, predictive, Univariate, Continuous, dynamicHMC
 import MLJBase # TODO: remove the dependency on MLJBase.jl
@@ -10,6 +11,7 @@ import MLJModelInterface
 import MonteCarloMeasurements
 import Tables
 const MMI = MLJModelInterface
+import StatsFuns: logsumexp
 
 export SossMLJModel
 export predict_particles
@@ -120,11 +122,11 @@ end
 
 function predict_particles(predictor::SossMLJPredictor, Xnew)
     args = predictor.args
-    pars = MonteCarloMeasurements.particles(predictor.post)
+    pars = Soss.particles(predictor.post)
     pred = predictor.pred
     transform = predictor.model.transform
     dist = pred(merge(args, transform(Xnew), pars))
-    return particles(dist)
+    return Soss.particles(dist)
 end
 
 #### BEGIN code to make predict_joint work on machines. Remove this once it is merged in MMI upstream.
