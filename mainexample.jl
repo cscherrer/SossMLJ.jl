@@ -1,8 +1,8 @@
+using Distributions
 using MLJ
 using MLJModelInterface
 using Soss
 using SossMLJ
-
 const MMI = MLJModelInterface
 
 m = @model X,α,σ begin
@@ -36,3 +36,7 @@ predictor_joint = SossMLJ.predict_joint(mach, X)
 rand(predictor_joint)
 
 logpdf(predictor_joint, rand(predictor_joint))
+
+truth.β - predict_particles(predictor_joint, X).β
+
+truth.yhat - predict_particles(predictor_joint, X).yhat
