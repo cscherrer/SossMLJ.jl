@@ -1,29 +1,28 @@
-__precompile__(false)
+__precompile__(false) # TODO: enable precompilation for this package
 
 module SossMLJ
 
-using MLJModelInterface
+import Distributions
+import Soss
+import Soss: Model, @model, predictive, Univariate, Continuous, dynamicHMC
+import MLJBase # TODO: remove the dependency on MLJBase.jl
+import MLJModelInterface
+import MonteCarloMeasurements
+import Tables
 const MMI = MLJModelInterface
 
-import MLJBase # TODO: remove the dependency on MLJBase.jl
-
-using Soss
-import Soss: Model, @model, predictive, Univariate, Continuous, dynamicHMC
-import Distributions
-import Base
-import Tables
-
-const Dists = Distributions
+export SossMLJModel
+export predict_particles
 
 # Just a placeholder
-m0 = @model X,α,σ begin
-    k = size(X,2)
-    β ~ Normal(0,α) |> iid(k)
-    yhat = X * β
-    y ~ For(eachindex(yhat)) do j
-        Normal(yhat[j], σ)
-    end
-end
+# m0 = @model X,α,σ begin
+#     k = size(X,2)
+#     β ~ Normal(0,α) |> iid(k)
+#     yhat = X * β
+#     y ~ For(eachindex(yhat)) do j
+#         Normal(yhat[j], σ)
+#     end
+# end
 
 # TODO: Add an way to specify which variable is observed, and which is predicted
 # e.g. even if we observe `y`, we might sometimes prefer to predict yhat
@@ -31,9 +30,6 @@ end
 # @mlj_model mutable struct SossMLJModel <: MMI.JointProbabilistic
 #     model :: Model = m0
 # end
-
-
-export SossMLJModel
 
 # TODO: Should the user instead specify a `prior` and `likelihood`?
 
@@ -51,29 +47,26 @@ function SossMLJModel(; model = m0, infer=dynamicHMC)
     return smm
 end
 
-
 function MLJModelInterface.clean!(smm::SossMLJModel)
     warning = ""
     return warning
 end
 
-struct MixedVariate <: Dists.VariateForm end
-struct MixedSupport <: Dists.ValueSupport end
+struct MixedVariate <: Distributions.VariateForm end
+struct MixedSupport <: Distributions.ValueSupport end
 
 struct SossMLJPredictor{M} <: Distributions.Distribution{MixedVariate, MixedSupport}
-    model :: M
+    model::M
     post
     pred
     args
 end
-
 
 function Base.rand(sp::SossMLJPredictor{M}) where {M}
     pars = rand(sp.post)
     args = merge(sp.args, pars)
     return rand(sp.pred(args)).y
 end
-
 
 function Distributions.logpdf(sp::SossMLJPredictor{M}, x) where {M}
     # Get all the distribution mixture components
@@ -123,6 +116,15 @@ function predict_joint(sm::SossMLJModel, fitresult, Xnew)
     pred = predictive(m, keys(post[1])...)
     args = merge(sm.transform(Xnew), sm.hyperparams)
     return SossMLJPredictor(sm, post, pred, args)
+end
+
+function predict_particles(predictor::SossMLJPredictor, Xnew)
+    args = predictor.args
+    pars = MonteCarloMeasurements.particles(predictor.post)
+    pred = predictor.pred
+    transform = predictor.model.transform
+    dist = pred(merge(args, transform(Xnew), pars))
+    return particles(dist)
 end
 
 #### BEGIN code to make predict_joint work on machines. Remove this once it is merged in MMI upstream.
