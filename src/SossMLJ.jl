@@ -103,7 +103,8 @@ function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
     end
 end
 
-function MMI.predict_joint(sm::SossMLJModel, fitresult, Xnew)
+# function MMI.predict_joint(sm::SossMLJModel, fitresult, Xnew)
+function predict_joint(sm::SossMLJModel, fitresult, Xnew)
     m = sm.model
     post = fitresult.post
     pred = predictive(m, keys(post[1])...)
