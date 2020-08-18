@@ -113,6 +113,4 @@ function MMI.predict_joint(sm::SossMLJModel, fitresult, Xnew)
     return SossPredictor(sm, post, pred, args)
 end
 
-
-
 end # module
