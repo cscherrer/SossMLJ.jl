@@ -1,0 +1,84 @@
+# # Bayesian linear regression
+
+# Import the necessary packages:
+
+using Distributions
+using MLJ
+using MLJModelInterface
+using Soss
+using SossMLJ
+const MMI = MLJModelInterface;
+
+# Use the Soss probabilistic programming language
+# to define a Bayesian linear regression model:
+
+m = @model X,α,σ begin
+    k = size(X,2)
+    β ~ Normal(0,α) |> iid(k)
+    yhat = X * β
+    y ~ For(eachindex(yhat)) do j
+        Normal(yhat[j], σ)
+    end
+end
+
+# Generate some synthetic features:
+
+num_rows = 100
+X = (a=randn(num_rows), b=randn(num_rows), c=randn(num_rows))
+
+# Define the hyperparameters of our prior distributions:
+
+hyperparameters = (α=2.0, σ=1.0)
+
+# Convert the Soss model into a `SossMLJModel`:
+
+model = SossMLJModel(hyperparameters, X -> (X=MMI.matrix(X),), m, dynamicHMC)
+
+# Generate some synthetic labels:
+
+args = merge(model.transform(X), hyperparameters)
+truth = rand(m(args))
+y = truth.y
+
+# Create an MLJ machine for fitting our model:
+
+mach = machine(model, X, y)
+
+# Fit the model:
+
+fit!(mach)
+
+# Construct the joint posterior distribution and the joint posterior predictive distribution:
+
+##predictor_joint = MLJ.predict_joint(mach, X)
+predictor_joint = SossMLJ.predict_joint(mach, X)
+typeof(predictor_joint)
+
+# Compare the joint posterior distribution to the true parameter values:
+
+truth.β - predict_particles(predictor_joint, X).β
+
+# Compare the joint posterior predictive distribution to the true labels:
+
+truth.yhat - predict_particles(predictor_joint, X).yhat
+
+# Draw a single sample from the joint posterior predictive distribution:
+
+s = rand(predictor_joint)
+
+# Evaluate the logpdf of the joint posterior predictive distribution at our sample:
+
+logpdf(predictor_joint, s)
+
+# Construct each of the marginal posterior predictive distributions:
+
+predictor_marginal = MLJ.predict(mach, X)
+typeof(predictor_marginal)
+
+# `predictor_marginal` has one element for each row in `X`
+
+size(predictor_marginal)
+
+# Draw a single sample from each of the marginal posterior predictive distributions:
+
+only.(rand.(predictor_marginal))
