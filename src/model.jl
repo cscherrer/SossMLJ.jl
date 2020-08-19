@@ -1,4 +1,5 @@
 import MLJModelInterface
+import Statistics
 const MMI = MLJModelInterface
 
 function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
