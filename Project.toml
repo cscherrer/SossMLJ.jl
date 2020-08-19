@@ -18,6 +18,7 @@ MLJ = "0.12"
 MLJModelInterface = "0.3"
 MonteCarloMeasurements = "0.9"
 Soss = "0.13"
+StatsFuns = "0.9"
 Tables = "1"
 julia = "1.3"
 
