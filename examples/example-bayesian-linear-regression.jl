@@ -7,7 +7,6 @@ using MLJ
 using MLJModelInterface
 using Soss
 using SossMLJ
-const MMI = MLJModelInterface;
 
 # Use the Soss probabilistic programming language
 # to define a Bayesian linear regression model:
@@ -32,7 +31,7 @@ hyperparameters = (α=2.0, σ=1.0)
 
 # Convert the Soss model into a `SossMLJModel`:
 
-model = SossMLJModel(hyperparameters, X -> (X=MMI.matrix(X),), m, dynamicHMC)
+model = SossMLJModel(hyperparameters, X -> (X=MLJModelInterface.matrix(X),), m, dynamicHMC)
 
 # Generate some synthetic labels:
 
