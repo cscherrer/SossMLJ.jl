@@ -13,7 +13,8 @@ using Statistics
 # Use the Soss probabilistic programming language
 # to define a Bayesian linear regression model:
 
-m = @model X,s,σ begin
+m = @model X,s,α,θ begin
+    σ ~ InverseGamma(α,θ)
     k = size(X,2)
     β ~ Normal(0,s) |> iid(k)
     yhat = X * β
@@ -29,7 +30,7 @@ X = (a=randn(num_rows), b=randn(num_rows), c=randn(num_rows))
 
 # Define the hyperparameters of our prior distributions:
 
-hyperparameters = (s=2.0, σ=1.0)
+hyperparameters = (s=2.0, α=1.0, θ=1.0)
 
 # Convert the Soss model into a `SossMLJModel`:
 
@@ -58,6 +59,10 @@ typeof(predictor_joint)
 # Compare the posterior distribution of `β` to the true coefficients `β`:
 
 truth.β - predict_particles(predictor_joint, X).β
+
+# Compare the posterior distribution of `σ` to the true dispersion parameter `σ`:
+
+truth.σ - predict_particles(predictor_joint, X).σ
 
 # Compare the joint posterior predictive distribution to the true labels:
 
