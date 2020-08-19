@@ -83,3 +83,7 @@ size(predictor_marginal)
 # Draw a single sample from each of the marginal posterior predictive distributions:
 
 only.(rand.(predictor_marginal))
+
+# Use cross validation to evaluate the model with respect to the L2 loss:
+
+MLJ.evaluate!(mach, resampling=MLJ.CV(; shuffle = true), measure=l2, operation=predict_mean)

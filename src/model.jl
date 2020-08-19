@@ -44,3 +44,9 @@ function predict_joint(sm::SossMLJModel, fitresult, Xnew)
     args = merge(sm.transform(Xnew), sm.hyperparams)
     return SossMLJPredictor(sm, post, pred, args)
 end
+
+function MMI.predict_mean(sm::SossMLJModel, fitresult, Xnew)
+    # predictor_joint = MMI.predict_joint(sm, fitresult, Xnew)
+    predictor_joint = predict_joint(sm, fitresult, Xnew)
+    return Statistics.mean(predict_particles(predictor_joint, Xnew).yhat)
+end
