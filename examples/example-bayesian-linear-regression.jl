@@ -4,9 +4,11 @@
 
 using Distributions
 using MLJ
+using MLJBase
 using MLJModelInterface
 using Soss
 using SossMLJ
+using Statistics
 
 # Use the Soss probabilistic programming language
 # to define a Bayesian linear regression model:
