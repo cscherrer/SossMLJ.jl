@@ -49,13 +49,13 @@ mach = machine(model, X, y)
 
 fit!(mach)
 
-# Construct the joint posterior distribution and the joint posterior predictive distribution:
+# Construct the posterior distribution and the joint posterior predictive distribution:
 
 ##predictor_joint = MLJ.predict_joint(mach, X)
 predictor_joint = SossMLJ.predict_joint(mach, X)
 typeof(predictor_joint)
 
-# Compare the joint posterior distribution to the true parameter values:
+# Compare the posterior distribution of `β` to the true value of `β`:
 
 truth.β - predict_particles(predictor_joint, X).β
 
