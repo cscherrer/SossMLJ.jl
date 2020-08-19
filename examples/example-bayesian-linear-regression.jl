@@ -13,9 +13,9 @@ using Statistics
 # Use the Soss probabilistic programming language
 # to define a Bayesian linear regression model:
 
-m = @model X,α,σ begin
+m = @model X,s,σ begin
     k = size(X,2)
-    β ~ Normal(0,α) |> iid(k)
+    β ~ Normal(0,s) |> iid(k)
     yhat = X * β
     y ~ For(eachindex(yhat)) do j
         Normal(yhat[j], σ)
@@ -29,7 +29,7 @@ X = (a=randn(num_rows), b=randn(num_rows), c=randn(num_rows))
 
 # Define the hyperparameters of our prior distributions:
 
-hyperparameters = (α=2.0, σ=1.0)
+hyperparameters = (s=2.0, σ=1.0)
 
 # Convert the Soss model into a `SossMLJModel`:
 
@@ -55,7 +55,7 @@ fit!(mach)
 predictor_joint = SossMLJ.predict_joint(mach, X)
 typeof(predictor_joint)
 
-# Compare the posterior distribution of `β` to the true value of `β`:
+# Compare the posterior distribution of `β` to the true coefficients `β`:
 
 truth.β - predict_particles(predictor_joint, X).β
 
@@ -65,11 +65,11 @@ truth.yhat - predict_particles(predictor_joint, X).yhat
 
 # Draw a single sample from the joint posterior predictive distribution:
 
-s = rand(predictor_joint)
+single_sample = rand(predictor_joint)
 
-# Evaluate the logpdf of the joint posterior predictive distribution at our sample:
+# Evaluate the logpdf of the joint posterior predictive distribution at this sample:
 
-logpdf(predictor_joint, s)
+logpdf(predictor_joint, single_sample)
 
 # Construct each of the marginal posterior predictive distributions:
 
