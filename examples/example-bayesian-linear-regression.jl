@@ -86,4 +86,4 @@ only.(rand.(predictor_marginal))
 
 # Use cross validation to evaluate the model with respect to the root mean squared error (RMSE):
 
-MLJ.evaluate!(mach, resampling=MLJ.CV(; shuffle = true), measure=rmse, operation=predict_mean)
+MLJ.evaluate!(mach, resampling=MLJ.CV(; shuffle = true), measure=rms, operation=predict_mean)
