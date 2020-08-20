@@ -84,6 +84,6 @@ size(predictor_marginal)
 
 only.(rand.(predictor_marginal))
 
-# Use cross validation to evaluate the model with respect to the L2 loss:
+# Use cross validation to evaluate the model with respect to the root mean squared error (RMSE):
 
-MLJ.evaluate!(mach, resampling=MLJ.CV(; shuffle = true), measure=l2, operation=predict_mean)
+MLJ.evaluate!(mach, resampling=MLJ.CV(; shuffle = true), measure=rmse, operation=predict_mean)
