@@ -13,8 +13,8 @@ using Statistics
 # Use the Soss probabilistic programming language
 # to define a Bayesian linear regression model:
 
-m = @model X,s,α,θ begin
-    σ ~ InverseGamma(α,θ)
+m = @model X,s,a,b begin
+    σ ~ HalfNormal(a,b)
     k = size(X,2)
     β ~ Normal(0,s) |> iid(k)
     yhat = X * β
@@ -26,11 +26,11 @@ end
 # Generate some synthetic features:
 
 num_rows = 100
-X = (a=randn(num_rows), b=randn(num_rows), c=randn(num_rows))
+X = (x1=randn(num_rows), x2=randn(num_rows), x3=randn(num_rows))
 
 # Define the hyperparameters of our prior distributions:
 
-hyperparameters = (s=2.0, α=1.0, θ=1.0)
+hyperparameters = (s=2.0, a=0.0, b=1.0)
 
 # Convert the Soss model into a `SossMLJModel`:
 
