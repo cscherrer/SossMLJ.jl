@@ -1,8 +1,7 @@
 import MLJModelInterface
 import Statistics
-const MMI = MLJModelInterface
 
-function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
+function MLJModelInterface.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
     # construct the model
     args = merge(sm.transform(X), sm.hyperparams)
 
@@ -25,7 +24,7 @@ function MLJModelInterface.clean!(smm::SossMLJModel)
     return warning
 end
 
-function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
+function MLJModelInterface.predict(sm::SossMLJModel, fitresult, Xnew)
     m = sm.model
     post = fitresult.post
     pred = Soss.predictive(m, keys(post[1])...)
@@ -36,8 +35,7 @@ function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
     end
 end
 
-# function MMI.predict_joint(sm::SossMLJModel, fitresult, Xnew)
-function predict_joint(sm::SossMLJModel, fitresult, Xnew)
+function MLJModelInterface.predict_joint(sm::SossMLJModel, fitresult, Xnew)
     m = sm.model
     post = fitresult.post
     pred = Soss.predictive(m, keys(post[1])...)
@@ -45,9 +43,8 @@ function predict_joint(sm::SossMLJModel, fitresult, Xnew)
     return SossMLJPredictor(sm, post, pred, args)
 end
 
-function MMI.predict_mean(sm::SossMLJModel, fitresult, Xnew;
+function MLJModelInterface.predict_mean(sm::SossMLJModel, fitresult, Xnew;
                           variable = sm.response)
-    # predictor_joint = MMI.predict_joint(sm, fitresult, Xnew)
-    predictor_joint = predict_joint(sm, fitresult, Xnew)
+    predictor_joint = MLJModelInterface.predict_joint(sm, fitresult, Xnew)
     return Statistics.mean(getproperty(predict_particles(predictor_joint, Xnew), variable))
 end
