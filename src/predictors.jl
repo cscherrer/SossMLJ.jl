@@ -1,19 +1,11 @@
 import Distributions
 import MonteCarloMeasurements
 
-function Base.rand(sp::SossMLJPredictor{M}) where {M}
+function Base.rand(sp::SossMLJPredictor{M};
+                   variable = sp.model.response) where {M}
     pars = rand(sp.post)
     args = merge(sp.args, pars)
-    return rand(sp.pred(args)).y
-end
-
-function predict_particles(predictor::SossMLJPredictor, Xnew)
-    args = predictor.args
-    pars = Soss.particles(predictor.post)
-    pred = predictor.pred
-    transform = predictor.model.transform
-    dist = pred(merge(args, transform(Xnew), pars))
-    return Soss.particles(dist)
+    return getproperty(rand(sp.pred(args)), variable)
 end
 
 function Distributions.logpdf(sp::SossMLJPredictor{M}, x) where {M}
