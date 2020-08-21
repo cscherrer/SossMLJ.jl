@@ -3,22 +3,25 @@ __precompile__(false) # TODO: enable precompilation for this package
 module SossMLJ
 
 import Distributions
-import MLJBase # TODO: remove the dependency on MLJBase.jl
+import MLJBase
 import MLJModelInterface
 import MonteCarloMeasurements
 import Soss
-import Soss: Model, @model, predictive, Univariate, Continuous, dynamicHMC
 import Statistics
 import Tables
-const MMI = MLJModelInterface
 
 export SossMLJModel
 export predict_particles
+export rms_distribution
+export rms_expected
+export rms_median
 
 include("types.jl")
 
-include("mljbase.jl") # TODO: remove the dependency on MLJBase.jl
-include("model.jl")
-include("predictor.jl")
+include("loss-functions.jl")
+include("machine-operations.jl")
+include("models.jl")
+include("particles.jl")
+include("predictors.jl")
 
 end # end module SossMLJ
