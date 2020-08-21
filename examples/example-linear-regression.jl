@@ -82,8 +82,7 @@ fit!(mach)
 
 # Construct the posterior distribution and the joint posterior predictive distribution:
 
-##predictor_joint = predict_joint(mach, X)
-predictor_joint = SossMLJ.predict_joint(mach, X)
+predictor_joint = predict_joint(mach, X)
 typeof(predictor_joint)
 
 # Draw a single sample from the joint posterior predictive distribution:
