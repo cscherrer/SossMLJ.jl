@@ -8,7 +8,7 @@ function MLJModelInterface.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing
 
     jd = sm.model(args)
 
-    y_namedtuple = namedtuple(sm.response)(y)
+    y_namedtuple = namedtuple(sm.response)(tuple(y))
     post = sm.infer(jd, y_namedtuple)
 
     # TODO: Allow w to be included
