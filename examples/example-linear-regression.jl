@@ -3,7 +3,6 @@
 # Import the necessary packages:
 
 using Distributions
-using MLJ
 using MLJBase
 using MLJModelInterface
 using Soss
@@ -115,7 +114,7 @@ truth.y - predict_particles(mach, X; response = :y)
 
 # Construct each of the marginal posterior predictive distributions:
 
-predictor_marginal = MLJ.predict(mach, X)
+predictor_marginal = MLJModelInterface.predict(mach, X)
 typeof(predictor_marginal)
 
 # `predictor_marginal` has one element for each row in `X`
