@@ -1,18 +1,23 @@
 import Distributions
 import MLJBase
 import MLJModelInterface
+const MMI = MLJModelInterface
 
-mutable struct SossMLJModel{H,T,M,I,R} <: MLJModelInterface.JointProbabilistic
-    hyperparams::H
-    transform::T
-    model::M
-    infer::I
+mutable struct SossMLJModel{M,T,I,H,R} <: MMI.JointProbabilistic
+    model :: M
+    transform :: T
+    infer :: I
+    hyperparams :: H
     response::R
 end
 
-function SossMLJModel(hyperparams, transform, model, infer)
+function SossMLJModel(m::Soss.Model;
+    transform = tbl -> (X = MMI.matrix(tbl),),
+    infer = Soss.dynamicHMC,
+    hyperparams = NamedTuple(),
     response = :y
-    return SossMLJModel(hyperparams, transform, model, infer, response)
+    )
+    return SossMLJModel(m,transform, infer, hyperparams, response)
 end
 
 struct MixedVariate <: Distributions.VariateForm end

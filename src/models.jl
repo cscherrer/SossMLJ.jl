@@ -1,5 +1,6 @@
 import MLJModelInterface
 import Statistics
+import NamedTupleTools: namedtuple
 
 function MLJModelInterface.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
     # construct the model
@@ -7,7 +8,8 @@ function MLJModelInterface.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing
 
     jd = sm.model(args)
 
-    post = sm.infer(jd, (y=y,))
+    y_namedtuple = namedtuple(sm.response)(y)
+    post = sm.infer(jd, y_namedtuple)
 
     # TODO: Allow w to be included
 
@@ -44,7 +46,7 @@ function MLJModelInterface.predict_joint(sm::SossMLJModel, fitresult, Xnew)
 end
 
 function MLJModelInterface.predict_mean(sm::SossMLJModel, fitresult, Xnew;
-                          variable = sm.response)
+                          response = sm.response)
     predictor_joint = MLJModelInterface.predict_joint(sm, fitresult, Xnew)
-    return Statistics.mean(getproperty(predict_particles(predictor_joint, Xnew), variable))
+    return Statistics.mean(getproperty(predict_particles(predictor_joint, Xnew), response))
 end

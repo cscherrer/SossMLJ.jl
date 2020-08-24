@@ -18,7 +18,7 @@ include("examples-list.jl")
                 hyperparams = (;)
                 transform = () -> ()
                 infer = Soss.dynamicHMC
-                model = SossMLJModel(hyperparams, transform, m, infer)
+                model = SossMLJModel(m, transform, infer, hyperparams, :y)
                 @test model.hyperparams == hyperparams
                 @test model.transform == transform
                 @test model.model == m

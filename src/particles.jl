@@ -10,7 +10,7 @@ function predict_particles(predictor::SossMLJPredictor, Xnew)
 end
 
 function predict_particles(sm::SossMLJModel, fitresult, Xnew;
-                           variable = sm.response)
+                           response = sm.response)
     predictor_joint = MLJModelInterface.predict_joint(sm, fitresult, Xnew)
-    return getproperty(predict_particles(predictor_joint, Xnew), variable)
+    return getproperty(predict_particles(predictor_joint, Xnew), response)
 end
