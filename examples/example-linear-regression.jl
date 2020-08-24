@@ -65,7 +65,7 @@ hyperparameters = (s=0.1, t=0.1)
 
 # Convert the Soss model into a `SossMLJModel`:
 
-model = SossMLJModel(hyperparameters, X -> (X=matrix(X),), m, dynamicHMC, :μ)
+model = SossMLJModel(m; transform=X -> (X=matrix(X),), infer=dynamicHMC, response=:y, hyperparams=hyperparameters)
 
 # Generate some synthetic labels:
 
@@ -87,7 +87,7 @@ typeof(predictor_joint)
 
 # Draw a single sample from the joint posterior predictive distribution:
 
-single_sample = rand(predictor_joint; variable = :y)
+single_sample = rand(predictor_joint; response = :y)
 
 # Evaluate the logpdf of the joint posterior predictive distribution at this sample:
 
@@ -99,19 +99,19 @@ truth.β
 
 # Posterior distribution of `β`
 
-predict_particles(mach, X; variable = :β)
+predict_particles(mach, X; response = :β)
 
 # Difference between the posterior distribution of `β` to the true values:
 
-truth.β - predict_particles(mach, X; variable = :β)
+truth.β - predict_particles(mach, X; response = :β)
 
 # Compare the joint posterior predictive distribution of `μ` to the true values:
 
-truth.μ - predict_particles(mach, X; variable = :μ)
+truth.μ - predict_particles(mach, X; response = :μ)
 
 # Compare the joint posterior predictive distribution of `y` to the true values:
 
-truth.y - predict_particles(mach, X; variable = :y)
+truth.y - predict_particles(mach, X; response = :y)
 
 # Construct each of the marginal posterior predictive distributions:
 
