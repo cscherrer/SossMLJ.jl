@@ -16,5 +16,4 @@ end
 
 function (::RMSMedian)(ŷ::MonteCarloMeasurements.MvParticles, y::Vector{<:Real})
     return Statistics.median(rms_distribution(ŷ, y))
-    # return Statistics.median.(rms_distribution(ŷ, y))
 end

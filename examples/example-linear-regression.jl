@@ -3,14 +3,13 @@
 # Import the necessary packages:
 
 using Distributions
-using MLJ
 using MLJBase
-using MLJModelInterface
 using Soss
 using SossMLJ
 using Statistics
 
-# In this example, we fit a Bayesian linear regression model.
+# In this example, we fit a Bayesian linear regression model with the
+# canonical link function.
 
 # Suppose that we are given a matrix of features `X` and a column vector of
 # labels `y`. `X` has `n` rows and `p` columns. `y` has `n` elements. We assume
@@ -26,8 +25,10 @@ using Statistics
 # coefficients.
 #
 # 3. The link function `g`, which provides the following relationship:
-# `g(E[Y]) = g(μ) = η = Xβ`. For linear regression, we choose `g` to be the
-# identity function, and therefore `g(μ) = μ = η = Xβ`.
+# `g(E[Y]) = g(μ) = η = Xβ`. It follows that `μ = g⁻¹(η)`, where `g⁻¹` denotes
+# the inverse of `g`. For linear regression, the canonical link function is the
+# identity function. Therefore, when using the canonical link function,
+# `μ = g⁻¹(η) = η`.
 #
 # In this model, the parameters that we want to estimate are `β` and `σ`.
 # We need to select prior distributions for these parameters. For each `βᵢ`
@@ -36,18 +37,18 @@ using Statistics
 # distribution with variance `t²`. `s` and `t` are hyperparameters that we will
 # need to choose.
 
-# We define this model in the Soss probabilistic programming language:
+# We define this model using the Soss probabilistic programming library:
 
 m = @model X, s, t begin
-    p = size(X, 2)
-    β ~ Normal(0, s) |> iid(p)
-    σ ~ HalfNormal(t)
-    η = X * β
-    μ = η
-    y ~ For(eachindex(μ)) do i
-        Normal(μ[i], σ)
+    p = size(X, 2) # number of features
+    β ~ Normal(0, s) |> iid(p) # coefficients
+    σ ~ HalfNormal(t) # dispersion
+    η = X * β # linear predictor
+    μ = η # `μ = g⁻¹(η) = η``
+    y ~ For(eachindex(μ)) do j
+        Normal(μ[j], σ) # `Yᵢ ~ Normal(mean=μᵢ, variance=σ²)`
     end
-end
+end;
 
 # Generate some synthetic features. Let us generate two continuous
 # features and two binary categorical features.
@@ -61,22 +62,27 @@ X = (x1 = x1, x2 = x2, x3 = x3, x4 = x4)
 
 # Define the hyperparameters of our prior distributions:
 
-hyperparameters = (s=0.1, t=0.1)
+hyperparams = (s=0.1, t=0.1)
 
 # Convert the Soss model into a `SossMLJModel`:
 
-model = SossMLJModel(hyperparameters, X -> (X=matrix(X),), m, dynamicHMC, :μ)
+model = SossMLJModel(m;
+    hyperparams = hyperparams,
+    transform   = X -> (X=matrix(X),),
+    infer       = dynamicHMC,
+    response    = :y,
+);
 
 # Generate some synthetic labels:
 
-args = merge(model.transform(X), hyperparameters)
+args = merge(model.transform(X), hyperparams)
 truth = rand(m(args))
 
 # Create an MLJ machine for fitting our model:
 
-mach = machine(model, X, truth.y)
+mach = MLJBase.machine(model, X, truth.y)
 
-# Fit the model:
+# Fit the machine. This may take several minutes.
 
 fit!(mach)
 
@@ -87,7 +93,7 @@ typeof(predictor_joint)
 
 # Draw a single sample from the joint posterior predictive distribution:
 
-single_sample = rand(predictor_joint; variable = :y)
+single_sample = rand(predictor_joint; response = :y)
 
 # Evaluate the logpdf of the joint posterior predictive distribution at this sample:
 
@@ -99,23 +105,23 @@ truth.β
 
 # Posterior distribution of `β`
 
-predict_particles(mach, X; variable = :β)
+predict_particles(mach, X; response = :β)
 
 # Difference between the posterior distribution of `β` to the true values:
 
-truth.β - predict_particles(mach, X; variable = :β)
+truth.β - predict_particles(mach, X; response = :β)
 
 # Compare the joint posterior predictive distribution of `μ` to the true values:
 
-truth.μ - predict_particles(mach, X; variable = :μ)
+truth.μ - predict_particles(mach, X; response = :μ)
 
 # Compare the joint posterior predictive distribution of `y` to the true values:
 
-truth.y - predict_particles(mach, X; variable = :y)
+truth.y - predict_particles(mach, X; response = :y)
 
 # Construct each of the marginal posterior predictive distributions:
 
-predictor_marginal = MLJ.predict(mach, X)
+predictor_marginal = MLJBase.predict(mach, X)
 typeof(predictor_marginal)
 
 # `predictor_marginal` has one element for each row in `X`

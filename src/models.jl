@@ -1,13 +1,17 @@
 import MLJModelInterface
 import Statistics
+import NamedTupleTools
 
-function MLJModelInterface.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
+const MMI = MLJModelInterface
+
+function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
     # construct the model
     args = merge(sm.transform(X), sm.hyperparams)
 
     jd = sm.model(args)
 
-    post = sm.infer(jd, (y=y,))
+    y_namedtuple = NamedTupleTools.namedtuple(sm.response)(tuple(y))
+    post = sm.infer(jd, y_namedtuple)
 
     # TODO: Allow w to be included
 
@@ -16,26 +20,27 @@ function MLJModelInterface.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing
 
     newargs = setdiff(Soss.sampled(jd.model),(:y,))
     pred = Soss.predictive(jd.model, newargs...)
-    ((model=sm, post=post), cache, report)
+    fitresult = (model=sm, post=post)
+    return (fitresult, cache, report)
 end
 
-function MLJModelInterface.clean!(smm::SossMLJModel)
+function MMI.clean!(smm::SossMLJModel)
     warning = ""
     return warning
 end
 
-function MLJModelInterface.predict(sm::SossMLJModel, fitresult, Xnew)
+function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
     m = sm.model
     post = fitresult.post
     pred = Soss.predictive(m, keys(post[1])...)
 
-    map(Tables.rowtable(Xnew)) do xrow
+    return map(Tables.rowtable(Xnew)) do xrow
         args = merge(sm.transform([xrow]), sm.hyperparams)
         SossMLJPredictor(sm, post, pred, args)
     end
 end
 
-function MLJModelInterface.predict_joint(sm::SossMLJModel, fitresult, Xnew)
+function MMI.predict_joint(sm::SossMLJModel, fitresult, Xnew)
     m = sm.model
     post = fitresult.post
     pred = Soss.predictive(m, keys(post[1])...)
@@ -43,8 +48,10 @@ function MLJModelInterface.predict_joint(sm::SossMLJModel, fitresult, Xnew)
     return SossMLJPredictor(sm, post, pred, args)
 end
 
-function MLJModelInterface.predict_mean(sm::SossMLJModel, fitresult, Xnew;
-                          variable = sm.response)
-    predictor_joint = MLJModelInterface.predict_joint(sm, fitresult, Xnew)
-    return Statistics.mean(getproperty(predict_particles(predictor_joint, Xnew), variable))
+function MMI.predict_mean(sm::SossMLJModel,
+                          fitresult,
+                          Xnew;
+                          response = sm.response)
+    predictor_joint = MMI.predict_joint(sm, fitresult, Xnew)
+    return Statistics.mean(getproperty(predict_particles(predictor_joint, Xnew), response))
 end
