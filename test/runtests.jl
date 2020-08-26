@@ -38,7 +38,7 @@ include("examples-list.jl")
 
             @testset "Additional tests for linear regression example" begin
                 include(joinpath(EXAMPLESROOT, "example-linear-regression.jl"))
-                MLJ.evaluate!(mach, resampling=MLJ.CV(; shuffle = true), measure=MLJ.rms, operation=MLJ.predict_mean)
+                MLJBase.evaluate!(mach, resampling=MLJ.CV(; shuffle = true), measure=MLJ.rms, operation=MLJ.predict_mean)
             end
         end
     end
