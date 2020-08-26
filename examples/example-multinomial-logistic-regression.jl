@@ -6,8 +6,7 @@ using Soss
 using MLJBase
 using SossMLJ
 
-using MLJModelInterface: matrix
-
+using MLJBase: matrix
 
 function softmax!(r::AbstractArray, x::AbstractArray)
     n = length(x)
@@ -26,9 +25,6 @@ end
 
 softmax!(x::AbstractArray{<:AbstractFloat}) = softmax!(x, x)
 softmax(x::AbstractArray{<:Real}) = softmax!(similar(x), x)
-
-
-
 
 Distributions.logpdf(d::UnivariateFinite, y::CategoricalValue)  = log(pdf(d,y))
 
