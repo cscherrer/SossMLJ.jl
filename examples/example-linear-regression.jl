@@ -4,7 +4,6 @@
 
 using Distributions
 using MLJBase
-using MLJModelInterface
 using Soss
 using SossMLJ
 using Statistics
@@ -47,7 +46,7 @@ m = @model X, s, t begin
     η = X * β # linear predictor
     μ = η # μ = g⁻¹(η) = η
     y ~ For(eachindex(μ)) do j
-        Normal(μ[j], σ)
+        Normal(μ[j], σ) # Yᵢ ~ Normal(mean=μᵢ, variance=σ²)
     end
 end
 
@@ -78,7 +77,7 @@ truth = rand(m(args))
 
 mach = MLJBase.machine(model, X, truth.y)
 
-# Fit the model:
+# Fit the machine:
 
 fit!(mach)
 
@@ -117,7 +116,7 @@ truth.y - predict_particles(mach, X; response = :y)
 
 # Construct each of the marginal posterior predictive distributions:
 
-predictor_marginal = MLJModelInterface.predict(mach, X)
+predictor_marginal = MLJBase.predict(mach, X)
 typeof(predictor_marginal)
 
 # `predictor_marginal` has one element for each row in `X`
