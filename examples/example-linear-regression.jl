@@ -82,7 +82,7 @@ truth = rand(m(args))
 
 mach = MLJBase.machine(model, X, truth.y)
 
-# Fit the machine:
+# Fit the machine. This may take several minutes.
 
 fit!(mach)
 

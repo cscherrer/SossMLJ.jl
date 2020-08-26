@@ -34,7 +34,7 @@ function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
     post = fitresult.post
     pred = Soss.predictive(m, keys(post[1])...)
 
-    return  map(Tables.rowtable(Xnew)) do xrow
+    return map(Tables.rowtable(Xnew)) do xrow
         args = merge(sm.transform([xrow]), sm.hyperparams)
         SossMLJPredictor(sm, post, pred, args)
     end

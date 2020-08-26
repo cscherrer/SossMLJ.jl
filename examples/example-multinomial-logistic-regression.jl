@@ -2,6 +2,7 @@
 
 # Import the necessary packages:
 
+using DataFrames
 using Distributions
 using MLJBase
 using NNlib
@@ -94,17 +95,15 @@ model = SossMLJModel(m;
 
 mach = MLJBase.machine(model, iris[!, feature_columns], iris[!, :Species])
 
-# Fit the machine:
+# Fit the machine. This may take several minutes.
 
-MLJBase.fit(model, 0, iris[!, feature_columns], iris[!, :Species])
-
-fit!(mach)
+MLJBase.fit!(mach)
 
 # Construct the posterior:
 
-jt = predict_joint(mach, iris)
+predictor_joint = MLJBase.predict_joint(mach, iris[!, feature_columns])
 typeof(predictor_joint)
 
 # Draw a sample from the posterior:
 
-rand(jt)
+single_sample = rand(predictor_joint)
