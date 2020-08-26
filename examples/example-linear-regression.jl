@@ -41,10 +41,9 @@ m = @model X, s, t begin
     p = size(X, 2)
     β ~ Normal(0, s) |> iid(p)
     σ ~ HalfNormal(t)
-    η = X * β
-    μ = η
-    y ~ For(eachindex(μ)) do i
-        Normal(μ[i], σ)
+    μ = X * β
+    y ~ For(eachindex(μ)) do j
+        Normal(μ[j], σ)
     end
 end
 
