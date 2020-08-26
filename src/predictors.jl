@@ -1,5 +1,6 @@
 import Distributions
 import MonteCarloMeasurements
+import NamedTupleTools
 
 function Base.rand(sp::SossMLJPredictor{M};
                    response = sp.model.response) where {M}
@@ -16,7 +17,7 @@ function Distributions.logpdf(sp::SossMLJPredictor{M}, y;
         sp.pred(args)
     end
 
-    y_namedtuple = namedtuple(response)(tuple(y))
+    y_namedtuple = NamedTupleTools.namedtuple(response)(tuple(y))
     # Evaluate logpdf(d,x) on each component d
     logvals = Base.Generator((d -> Distributions.logpdf(d, y_namedtuple)) ∘ dists.f, dists.iter)
     n = length(sp.post)

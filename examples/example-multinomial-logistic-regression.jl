@@ -26,6 +26,11 @@ using Statistics
 # - `Yᵢ` follows a multinomial distribution with `k` categories, mean `μᵢ`, and one trial.
 # - `Yᵢ` follows a categorical distribution with `k` categories and mean `μᵢ`.
 #
+# In the special case of two categories, i.e. `k = 2`, the multinomial
+# distribution reduces to the binomial distribution, the categorical
+# distribution reduces to the Bernoulli distribution, and the  multinomial
+# logistic regression model reduces to the logistic regression model.
+#
 # 2. The systematic component, which consists of linear predictor `η` (eta),
 # which we define as `η := Xβ`, where `β` is the column vector of `p`
 # coefficients.
@@ -52,31 +57,46 @@ m = @model X,pool begin
     n = size(X,1) # number of observations
     p = size(X,2) # number of features
     k = length(pool.levels) # number of classes
-    β ~ Normal(0.0, 1.0) |> iid(p, C) # coefficients
+    β ~ Normal(0.0, 1.0) |> iid(p, k) # coefficients
     η = X * β # linear predictor
     μ = mapslices(NNlib.softmax, η; dims=2) # μ = g⁻¹(η) = softmax(η)
-    y_dists = UnivariateFinite(pool.levels, μ; pool=pool)
-    y ~ For(j -> y_dists[j], n) # Yᵢ ~ Categorical(mean=μᵢ, categories=k)
+    y_dists = UnivariateFinite(pool.levels, μ; pool=pool) # `UnivariateFinite` is mathematically equivalent to `Categorical`
+    y ~ For(j -> y_dists[j], n) # `Yᵢ ~ UnivariateFinite(mean=μᵢ, categories=k)`, which is mathematically equivalent to `Yᵢ ~ Categorical(mean=μᵢ, categories=k)`
 end;
 
 # Import the *Iris* flower data set:
 
 iris = dataset("datasets", "iris");
 
+# Define our feature columns:
+
+feature_columns = [
+    :PetalLength,
+    :PetalWidth,
+    :SepalLength,
+    :SepalWidth,
+]
+
+# Define our label column:
+
+label_column = :Species
+
 # Convert the Soss model into a `SossMLJModel`:
 
 model = SossMLJModel(m;
     hyperparams = (pool=iris.Species.pool,),
-    transform   = tbl -> (X=MLJBase.matrix(tbl[[:SepalWidth, :SepalLength, :PetalWidth, :PetalLength]]),),
+    transform   = tbl -> (X=MLJBase.matrix(tbl[!, feature_columns]),),
     infer       = dynamicHMC,
-    response    = :y
-)
+    response    = :y,
+);
 
 # Create an MLJ machine for fitting our model:
 
-mach = MLJBase.machine(model, iris, iris.Species)
+mach = MLJBase.machine(model, iris[!, feature_columns], iris[!, :Species])
 
 # Fit the machine:
+
+MLJBase.fit(model, 0, iris[!, feature_columns], iris[!, :Species])
 
 fit!(mach)
 

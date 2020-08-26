@@ -20,7 +20,7 @@ export rms_median
 
 # TODO: remove the `logpdf` definition once this is merged into MLJBase upstream
 
-Distributions.logpdf(d::MLJBase.UnivariateFinite, y::MLJBase.CategoricalValue)  = log(pdf(d,y))
+Distributions.logpdf(d::MLJBase.UnivariateFinite, y::MLJBase.CategoricalValue)  = log(Distributions.pdf(d,y))
 
 include("types.jl")
 

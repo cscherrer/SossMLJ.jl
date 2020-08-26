@@ -20,7 +20,8 @@ function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
 
     newargs = setdiff(Soss.sampled(jd.model),(:y,))
     pred = Soss.predictive(jd.model, newargs...)
-    ((model=sm, post=post), cache, report)
+    fitresult = (model=sm, post=post)
+    return (fitresult, cache, report)
 end
 
 function MMI.clean!(smm::SossMLJModel)
@@ -33,7 +34,7 @@ function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
     post = fitresult.post
     pred = Soss.predictive(m, keys(post[1])...)
 
-    map(Tables.rowtable(Xnew)) do xrow
+    return  map(Tables.rowtable(Xnew)) do xrow
         args = merge(sm.transform([xrow]), sm.hyperparams)
         SossMLJPredictor(sm, post, pred, args)
     end

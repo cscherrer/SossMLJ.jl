@@ -44,11 +44,11 @@ m = @model X, s, t begin
     β ~ Normal(0, s) |> iid(p) # coefficients
     σ ~ HalfNormal(t) # dispersion
     η = X * β # linear predictor
-    μ = η # μ = g⁻¹(η) = η
+    μ = η # `μ = g⁻¹(η) = η``
     y ~ For(eachindex(μ)) do j
-        Normal(μ[j], σ) # Yᵢ ~ Normal(mean=μᵢ, variance=σ²)
+        Normal(μ[j], σ) # `Yᵢ ~ Normal(mean=μᵢ, variance=σ²)`
     end
-end
+end;
 
 # Generate some synthetic features. Let us generate two continuous
 # features and two binary categorical features.
@@ -62,15 +62,20 @@ X = (x1 = x1, x2 = x2, x3 = x3, x4 = x4)
 
 # Define the hyperparameters of our prior distributions:
 
-hyperparameters = (s=0.1, t=0.1)
+hyperparams = (s=0.1, t=0.1)
 
 # Convert the Soss model into a `SossMLJModel`:
 
-model = SossMLJModel(m; transform=X -> (X=matrix(X),), infer=dynamicHMC, response=:y, hyperparams=hyperparameters)
+model = SossMLJModel(m;
+    hyperparams = hyperparams,
+    transform   = X -> (X=matrix(X),),
+    infer       = dynamicHMC,
+    response    = :y,
+);
 
 # Generate some synthetic labels:
 
-args = merge(model.transform(X), hyperparameters)
+args = merge(model.transform(X), hyperparams)
 truth = rand(m(args))
 
 # Create an MLJ machine for fitting our model:
