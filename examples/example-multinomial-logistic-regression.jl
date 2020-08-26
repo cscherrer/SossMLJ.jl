@@ -46,7 +46,7 @@ using Statistics
 # we choose a normal distribution with zero mean and unit variance`. Here, `βᵢ`
 # denotes the `i`th component of `β`.
 
-# We define this model in the Soss probabilistic programming language:
+# We define this model using the Soss probabilistic programming library:
 
 m = @model X,pool begin
     n = size(X,1) # number of observations

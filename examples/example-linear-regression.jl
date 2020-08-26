@@ -37,7 +37,7 @@ using Statistics
 # distribution with variance `t²`. `s` and `t` are hyperparameters that we will
 # need to choose.
 
-# We define this model in the Soss probabilistic programming language:
+# We define this model using the Soss probabilistic programming library:
 
 m = @model X, s, t begin
     p = size(X, 2) # number of features
