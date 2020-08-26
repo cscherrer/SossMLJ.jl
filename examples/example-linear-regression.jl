@@ -9,7 +9,8 @@ using Soss
 using SossMLJ
 using Statistics
 
-# In this example, we fit a Bayesian linear regression model.
+# In this example, we fit a Bayesian linear regression model with the
+# canonical link function.
 
 # Suppose that we are given a matrix of features `X` and a column vector of
 # labels `y`. `X` has `n` rows and `p` columns. `y` has `n` elements. We assume
@@ -25,8 +26,10 @@ using Statistics
 # coefficients.
 #
 # 3. The link function `g`, which provides the following relationship:
-# `g(E[Y]) = g(μ) = η = Xβ`. For linear regression, we choose `g` to be the
-# identity function, and therefore `g(μ) = μ = η = Xβ`.
+# `g(E[Y]) = g(μ) = η = Xβ`. It follows that `μ = g⁻¹(η)`, where `g⁻¹` denotes
+# the inverse of `g`. For linear regression, the canonical link function is the
+# identity function. Therefore, when using the canonical link function,
+# `μ = g⁻¹(η) = η`.
 #
 # In this model, the parameters that we want to estimate are `β` and `σ`.
 # We need to select prior distributions for these parameters. For each `βᵢ`
@@ -38,10 +41,11 @@ using Statistics
 # We define this model in the Soss probabilistic programming language:
 
 m = @model X, s, t begin
-    p = size(X, 2)
-    β ~ Normal(0, s) |> iid(p)
-    σ ~ HalfNormal(t)
-    μ = X * β
+    p = size(X, 2) # number of features
+    β ~ Normal(0, s) |> iid(p) # coefficients
+    σ ~ HalfNormal(t) # dispersion
+    η = X * β # linear predictor
+    μ = η # μ = g⁻¹(η) = η
     y ~ For(eachindex(μ)) do j
         Normal(μ[j], σ)
     end
@@ -72,7 +76,7 @@ truth = rand(m(args))
 
 # Create an MLJ machine for fitting our model:
 
-mach = machine(model, X, truth.y)
+mach = MLJBase.machine(model, X, truth.y)
 
 # Fit the model:
 
