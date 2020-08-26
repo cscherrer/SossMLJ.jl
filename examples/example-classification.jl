@@ -28,6 +28,13 @@ softmax!(x::AbstractArray{<:AbstractFloat}) = softmax!(x, x)
 softmax(x::AbstractArray{<:Real}) = softmax!(similar(x), x)
 
 
+
+
+Distributions.logpdf(d::UnivariateFinite, y::CategoricalValue)  = log(pdf(d,y))
+
+###################################
+
+
 m = @model X,pool begin
     n = size(X,1)
     k = size(X,2)
@@ -40,16 +47,6 @@ m = @model X,pool begin
     
     y ~ For(j -> ydists[j], n)
 end;
-
-X = randn(10,4);
-
-data = rand(m(X=X,pool=iris.Species.pool));
-
-pairs(data)
-
-Distributions.logpdf(d::UnivariateFinite, y::CategoricalValue)  = log(pdf(d,y))
-
-logpdf(m(X=X,pool=iris.Species.pool), data)
 
 
 
@@ -70,6 +67,6 @@ jt = predict_joint(mach, iris)
 
 rand(jt)
 
-predict_particles(jt, iris)
+# predict_particles(jt, iris)
 
-predict_mean(mach, X)
+# predict_mean(mach, X)
