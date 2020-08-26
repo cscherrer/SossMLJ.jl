@@ -3,20 +3,13 @@ iris = dataset("datasets", "iris")
 
 using Distributions
 using Soss
+using MLJBase
+using SossMLJ
+
+using MLJModelInterface: matrix
 
 
-
-
-"""
-    smax!(r::AbstractArray, x::AbstractArray)
-
-Overwrite `r` with the `smax` (or _normalized exponential_) transformation of `x`
-
-That is, `r` is overwritten with `exp.(x)`, normalized to sum to 1.
-
-See the [Wikipedia entry](https://en.wikipedia.org/wiki/smax_function)
-"""
-function smax!(r::AbstractArray, x::AbstractArray)
+function softmax!(r::AbstractArray, x::AbstractArray)
     n = length(x)
     length(r) == n || throw(DimensionMismatch("Inconsistent array lengths."))
     u = maximum(x)
@@ -31,49 +24,49 @@ function smax!(r::AbstractArray, x::AbstractArray)
     r
 end
 
-"""
-    smax(x::AbstractArray{<:Real})
-
-Return the [`smax transformation`](https://en.wikipedia.org/wiki/smax_function) applied to `x`
-"""
-smax!(x::AbstractArray{<:AbstractFloat}) = smax!(x, x)
-smax(x::AbstractArray{<:Real}) = smax!(similar(x), x)
+softmax!(x::AbstractArray{<:AbstractFloat}) = softmax!(x, x)
+softmax(x::AbstractArray{<:Real}) = softmax!(similar(x), x)
 
 
-
-
-m = @model X,num_levels begin
+m = @model X,pool begin
+    n = size(X,1)
     k = size(X,2)
+    num_levels = length(pool.levels)
     β ~ Normal() |> iid(k,num_levels)
-    p = smax.(eachrow(X*β))
+
+    p = mapslices(softmax, X*β; dims=2)
     
-    species ~ For(p) do pj
-            Categorical(pj; check_args=false)
-        end
-end
+    ydists = UnivariateFinite(pool.levels, p; pool=pool)
+    
+    y ~ For(j -> ydists[j], n)
+end;
 
 X = randn(10,4);
 
-rand(m(X=X,num_levels=3)) |> pairs
+data = rand(m(X=X,pool=iris.Species.pool));
 
-using SossMLJ
+pairs(data)
 
-using MLJModelInterface: matrix
+Distributions.logpdf(d::UnivariateFinite, y::CategoricalValue)  = log(pdf(d,y))
+
+logpdf(m(X=X,pool=iris.Species.pool), data)
+
+
 
 mdl = SossMLJModel(m;
-    hyperparams = (num_levels=3,), 
+    hyperparams = (pool=iris.Species.pool,), 
     transform   = tbl -> (X=matrix(tbl[[:SepalWidth, :SepalLength, :PetalWidth, :PetalLength]]),),
     infer       = dynamicHMC,
-    response    = :species
+    response    = :y
 )
 
 
 using MLJ
-mach = machine(mdl, iris, getproperty.(iris.Species, :level))
+mach = machine(mdl, iris, iris.Species)
 
 fit!(mach)
 
-jt = SossMLJ.predict_joint(mach, iris)
+jt = predict_joint(mach, iris)
 
 rand(jt)
 
