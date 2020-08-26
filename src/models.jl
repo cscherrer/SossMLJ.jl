@@ -1,14 +1,16 @@
 import MLJModelInterface
 import Statistics
-import NamedTupleTools: namedtuple
+import NamedTupleTools
 
-function MLJModelInterface.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
+const MMI = MLJModelInterface
+
+function MMI.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing)
     # construct the model
     args = merge(sm.transform(X), sm.hyperparams)
 
     jd = sm.model(args)
 
-    y_namedtuple = namedtuple(sm.response)(tuple(y))
+    y_namedtuple = NamedTupleTools.namedtuple(sm.response)(tuple(y))
     post = sm.infer(jd, y_namedtuple)
 
     # TODO: Allow w to be included
@@ -21,12 +23,12 @@ function MLJModelInterface.fit(sm::SossMLJModel, verbosity::Int, X, y, w=nothing
     ((model=sm, post=post), cache, report)
 end
 
-function MLJModelInterface.clean!(smm::SossMLJModel)
+function MMI.clean!(smm::SossMLJModel)
     warning = ""
     return warning
 end
 
-function MLJModelInterface.predict(sm::SossMLJModel, fitresult, Xnew)
+function MMI.predict(sm::SossMLJModel, fitresult, Xnew)
     m = sm.model
     post = fitresult.post
     pred = Soss.predictive(m, keys(post[1])...)
@@ -37,7 +39,7 @@ function MLJModelInterface.predict(sm::SossMLJModel, fitresult, Xnew)
     end
 end
 
-function MLJModelInterface.predict_joint(sm::SossMLJModel, fitresult, Xnew)
+function MMI.predict_joint(sm::SossMLJModel, fitresult, Xnew)
     m = sm.model
     post = fitresult.post
     pred = Soss.predictive(m, keys(post[1])...)
@@ -45,8 +47,10 @@ function MLJModelInterface.predict_joint(sm::SossMLJModel, fitresult, Xnew)
     return SossMLJPredictor(sm, post, pred, args)
 end
 
-function MLJModelInterface.predict_mean(sm::SossMLJModel, fitresult, Xnew;
+function MMI.predict_mean(sm::SossMLJModel,
+                          fitresult,
+                          Xnew;
                           response = sm.response)
-    predictor_joint = MLJModelInterface.predict_joint(sm, fitresult, Xnew)
+    predictor_joint = MMI.predict_joint(sm, fitresult, Xnew)
     return Statistics.mean(getproperty(predict_particles(predictor_joint, Xnew), response))
 end

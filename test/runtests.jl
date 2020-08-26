@@ -3,6 +3,7 @@ using Test
 
 import Documenter
 import Literate
+import MLJBase
 import Soss
 
 include("examples-list.jl")

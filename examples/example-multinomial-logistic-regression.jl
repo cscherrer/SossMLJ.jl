@@ -1,12 +1,14 @@
-using RDatasets
-iris = dataset("datasets", "iris")
+
 
 using Distributions
 using Soss
 using MLJBase
 using SossMLJ
 
-using MLJBase: matrix
+
+
+using RDatasets
+iris = dataset("datasets", "iris")
 
 function softmax!(r::AbstractArray, x::AbstractArray)
     n = length(x)
@@ -36,18 +38,18 @@ m = @model X,pool begin
     k = size(X,2)
     num_levels = length(pool.levels)
     β ~ Normal() |> iid(k,num_levels)
-    
+
     η = X * β
     μ = mapslices(softmax, η; dims=2)
-    
+
     ydists = UnivariateFinite(pool.levels, μ; pool=pool)
-    
+
     y ~ For(j -> ydists[j], n)
 end;
 
 mdl = SossMLJModel(m;
-    hyperparams = (pool=iris.Species.pool,), 
-    transform   = tbl -> (X=matrix(tbl[[:SepalWidth, :SepalLength, :PetalWidth, :PetalLength]]),),
+    hyperparams = (pool=iris.Species.pool,),
+    transform   = tbl -> (X=MLJBase.matrix(tbl[[:SepalWidth, :SepalLength, :PetalWidth, :PetalLength]]),),
     infer       = dynamicHMC,
     response    = :y
 )

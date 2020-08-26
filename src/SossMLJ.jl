@@ -10,6 +10,8 @@ import Soss
 import Statistics
 import Tables
 
+const MMI = MLJModelInterface
+
 export SossMLJModel
 export predict_particles
 export rms_distribution

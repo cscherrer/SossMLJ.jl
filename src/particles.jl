@@ -1,4 +1,7 @@
+import MLJModelInterface
 import Soss
+
+const MMI = MLJModelInterface
 
 function predict_particles(predictor::SossMLJPredictor, Xnew)
     args = predictor.args
@@ -9,8 +12,10 @@ function predict_particles(predictor::SossMLJPredictor, Xnew)
     return Soss.particles(dist)
 end
 
-function predict_particles(sm::SossMLJModel, fitresult, Xnew;
+function predict_particles(sm::SossMLJModel,
+                           fitresult,
+                           Xnew;
                            response = sm.response)
-    predictor_joint = MLJModelInterface.predict_joint(sm, fitresult, Xnew)
+    predictor_joint = MMI.predict_joint(sm, fitresult, Xnew)
     return getproperty(predict_particles(predictor_joint, Xnew), response)
 end

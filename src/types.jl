@@ -1,6 +1,7 @@
 import Distributions
 import MLJBase
 import MLJModelInterface
+
 const MMI = MLJModelInterface
 
 mutable struct SossMLJModel{M,T,I,H,R} <: MMI.JointProbabilistic
