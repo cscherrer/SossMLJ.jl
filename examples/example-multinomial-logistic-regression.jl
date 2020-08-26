@@ -36,15 +36,14 @@ m = @model X,pool begin
     k = size(X,2)
     num_levels = length(pool.levels)
     β ~ Normal() |> iid(k,num_levels)
-
-    p = mapslices(softmax, X*β; dims=2)
     
-    ydists = UnivariateFinite(pool.levels, p; pool=pool)
+    η = X * β
+    μ = mapslices(softmax, η; dims=2)
+    
+    ydists = UnivariateFinite(pool.levels, μ; pool=pool)
     
     y ~ For(j -> ydists[j], n)
 end;
-
-
 
 mdl = SossMLJModel(m;
     hyperparams = (pool=iris.Species.pool,), 
