@@ -4,6 +4,7 @@ using Distributions
 using Soss
 using MLJBase
 using SossMLJ
+using NNlib
 
 
 
@@ -34,17 +35,14 @@ Distributions.logpdf(d::UnivariateFinite, y::CategoricalValue)  = log(pdf(d,y))
 
 
 m = @model X,pool begin
-    n = size(X,1)
-    k = size(X,2)
-    num_levels = length(pool.levels)
+    n = size(X,1) # number of observations
+    k = size(X,2) # number of features
+    num_levels = length(pool.levels) # number of classes
     β ~ Normal() |> iid(k,num_levels)
-
     η = X * β
-    μ = mapslices(softmax, η; dims=2)
-
-    ydists = UnivariateFinite(pool.levels, μ; pool=pool)
-
-    y ~ For(j -> ydists[j], n)
+    μ = mapslices(NNlib.softmax, η; dims=2)
+    y_dists = UnivariateFinite(pool.levels, μ; pool=pool)
+    y ~ For(j -> y_dists[j], n)
 end;
 
 mdl = SossMLJModel(m;
