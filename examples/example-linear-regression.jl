@@ -17,18 +17,9 @@ using Statistics
 # We define `μ` (mu) as the expected value of `Y`, i.e. `μ := E[Y]`. Our model
 # comprises three components:
 #
-# 1. The probability distribution of `Y`: for linear regression, we assume that
-# each `Yᵢ` follows a normal distribution with mean `μᵢ` and variance `σ²`.
-#
-# 2. The systematic component, which consists of linear predictor `η` (eta),
-# which we define as `η := Xβ`, where `β` is the column vector of `p`
-# coefficients.
-#
-# 3. The link function `g`, which provides the following relationship:
-# `g(E[Y]) = g(μ) = η = Xβ`. It follows that `μ = g⁻¹(η)`, where `g⁻¹` denotes
-# the inverse of `g`. For linear regression, the canonical link function is the
-# identity function. Therefore, when using the canonical link function,
-# `μ = g⁻¹(η) = η`.
+# 1. The probability distribution of `Y`: for linear regression, we assume that each `Yᵢ` follows a normal distribution with mean `μᵢ` and variance `σ²`.
+# 2. The systematic component, which consists of linear predictor `η` (eta), which we define as `η := Xβ`, where `β` is the column vector of `p` coefficients.
+# 3. The link function `g`, which provides the following relationship: `g(E[Y]) = g(μ) = η = Xβ`. It follows that `μ = g⁻¹(η)`, where `g⁻¹` denotes the inverse of `g`. For linear regression, the canonical link function is the identity function. Therefore, when using the canonical link function, `μ = g⁻¹(η) = η`.
 #
 # In this model, the parameters that we want to estimate are `β` and `σ`.
 # We need to select prior distributions for these parameters. For each `βᵢ`
