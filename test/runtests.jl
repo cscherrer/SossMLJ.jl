@@ -56,25 +56,14 @@ include("examples-list.jl")
 
     @testset "Examples" begin
         for example in EXAMPLES
-            @testset "Run examples" begin
-                @testset "Example: $(example[1])" begin
-                    example_file = joinpath(EXAMPLESROOT, "example-$(example[2]).jl")
-                    include(example_file)
-                end
-            end
-
-            @testset "Additional tests for examples" begin
-                @testset "Additional tests for linear regression example" begin
-                    include(joinpath(EXAMPLESROOT, "example-linear-regression.jl"))
-                    MLJBase.evaluate!(mach, resampling=MLJBase.CV(; shuffle = true), measure=MLJBase.rms, operation=MLJBase.predict_mean)
-                end
-
-                @testset "Additional tests for multinomial logistic regression example" begin
-                    include(joinpath(EXAMPLESROOT, "example-multinomial-logistic-regression.jl"))
-                    samples = hcat([rand(predictor_joint) for sample = 1:1_000]...)
-                    modes = [mode(samples[i, :]) for i = 1:size(samples, 1)]
-                    accuracy = Statistics.mean(modes .== iris[!, label_column])
-                    @test accuracy >= 0.9 # make sure the accuracy is at least 90%
+            @testset "Run example: $(example[1])" begin
+                example_file = joinpath(EXAMPLESROOT, "example-$(example[2]).jl")
+                extra_example_tests = joinpath(TESTROOT, "extra-example-tests", "$(example[2]).jl")
+                @info("Running $(example_file)")
+                include(example_file)
+                if isfile(extra_example_tests)
+                    @info("Running $(extra_example_tests)")
+                    include(extra_example_tests)
                 end
             end
         end
