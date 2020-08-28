@@ -7,8 +7,8 @@ using RDatasets
 using Soss
 using SossMLJ
 using Statistics</code></pre><p>In this example, we fit a Bayesian multinomial logistic regression model with the canonical link function.</p><p>Suppose that we are given a matrix of features <code>X</code> and a column vector of labels <code>y</code>. <code>X</code> has <code>n</code> rows and <code>p</code> columns. <code>y</code> has <code>n</code> elements. We assume that our observation vector <code>y</code> is a realization of a random variable <code>Y</code>. We define <code>μ</code> (mu) as the expected value of <code>Y</code>, i.e. <code>μ := E[Y]</code>. Our model comprises three components:</p><ol><li>The probability distribution of <code>Y</code>. We assume that each <code>Yᵢ</code> follows a multinomial distribution with <code>k</code> categories, mean <code>μᵢ</code>, and one trial.</li><li>The systematic component, which consists of linear predictor <code>η</code> (eta), which we define as <code>η := Xβ</code>, where <code>β</code> is the column vector of <code>p</code> coefficients.</li><li>The link function <code>g</code>, which provides the following relationship: <code>g(E[Y]) = g(μ) = η = Xβ</code>. It follows that <code>μ = g⁻¹(η)</code>, where <code>g⁻¹</code> denotes the inverse of <code>g</code>. In multinomial logistic regression, the canonical link function is the generalized logit function. The inverse of the generalized logit function is the softmax function. Therefore, when using the canonical link function, <code>μ = g⁻¹(η) = softmax(η)</code>.</li></ol><p>A multinomial distribution with one trial is equivalent to the categorical distribution. Therefore, the following two statements are equivalent:</p><ul><li><code>Yᵢ</code> follows a multinomial distribution with <code>k</code> categories, mean <code>μᵢ</code>, and one trial.</li><li><code>Yᵢ</code> follows a categorical distribution with <code>k</code> categories and mean <code>μᵢ</code>.</li></ul><p>Observe that the logistic regression model is a special case of the multinomial logistic regression model where <code>k = 2</code>.</p><p>In this model, the parameters that we want to estimate are the coefficients <code>β</code>. We need to select prior distributions for these parameters. For each <code>βᵢ</code> we choose a normal distribution with zero mean and unit variance. Here, <code>βᵢ</code> denotes the <code>i</code>th component of <code>β</code>.</p><p>We define this model using the Soss probabilistic programming library:</p><pre><code class="language-julia">m = @model X,pool begin
-    n = size(X,1) # number of observations
-    p = size(X,2) # number of features
+    n = size(X, 1) # number of observations
+    p = size(X, 2) # number of features
     k = length(pool.levels) # number of classes
     β ~ Normal(0.0, 1.0) |&gt; iid(p, k) # coefficients
     η = X * β # linear predictor
@@ -24,21 +24,22 @@ end;</code></pre><p>Import the <em>Iris</em> flower data set:</p><pre><code clas
  :PetalLength
  :PetalWidth
  :SepalLength
- :SepalWidth</pre><p>Define our label column:</p><pre><code class="language-julia">label_column = :Species</code></pre><pre class="documenter-example-output">:Species</pre><p>Convert the Soss model into a <code>SossMLJModel</code>:</p><pre><code class="language-julia">model = SossMLJModel(m;
+ :SepalWidth</pre><p>Define our label column:</p><pre><code class="language-julia">label_column = :Species</code></pre><pre class="documenter-example-output">:Species</pre><p>Convert the Soss model into a <code>SossMLJModel</code>:</p><pre><code class="language-julia">model = SossMLJModel(;
+    model       = m,
+    predictor   = MLJBase.UnivariateFinite,
     hyperparams = (pool=iris.Species.pool,),
-    transform   = tbl -&gt; (X=MLJBase.matrix(tbl[1:size(tbl, 1), feature_columns]),),
     infer       = dynamicHMC,
     response    = :y,
-);</code></pre><p>Create an MLJ machine for fitting our model:</p><pre><code class="language-julia">mach = MLJBase.machine(model, iris[1:size(iris, 1), feature_columns], iris[1:size(iris, 1), :Species])</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{Model{,…},…}} @322[39m trained 0 times.
+);</code></pre><p>Create an MLJ machine for fitting our model:</p><pre><code class="language-julia">mach = MLJBase.machine(model, iris[!, feature_columns], iris[!, :Species])</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{,…}} @204[39m trained 0 times.
   args: 
-    1:	[34mSource @807[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
-    2:	[34mSource @033[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
-</pre><p>Fit the machine. This may take several minutes.</p><pre><code class="language-julia">MLJBase.fit!(mach)</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{Model{,…},…}} @322[39m trained 1 time.
+    1:	[34mSource @306[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
+    2:	[34mSource @499[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
+</pre><p>Fit the machine. This may take several minutes.</p><pre><code class="language-julia">MLJBase.fit!(mach)</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{,…}} @204[39m trained 1 time.
   args: 
-    1:	[34mSource @807[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
-    2:	[34mSource @033[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
-</pre><p>Construct the joint posterior:</p><pre><code class="language-julia">predictor_joint = MLJBase.predict_joint(mach, iris[1:size(iris, 1), feature_columns])
-typeof(predictor_joint)</code></pre><pre class="documenter-example-output">SossMLJ.SossMLJPredictor{SossMLJModel{Soss.Model{NamedTuple{(:X, :pool),T} where T&lt;:Tuple,TypeEncoding(begin
+    1:	[34mSource @306[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
+    2:	[34mSource @499[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
+</pre><p>Construct the joint posterior:</p><pre><code class="language-julia">predictor_joint = MLJBase.predict_joint(mach, iris[!, feature_columns])
+typeof(predictor_joint)</code></pre><pre class="documenter-example-output">SossMLJ.SossMLJPredictor{SossMLJModel{MLJBase.UnivariateFinite,Soss.Model{NamedTuple{(:X, :pool),T} where T&lt;:Tuple,TypeEncoding(begin
     k = length(pool.levels)
     p = size(X, 2)
     β ~ Normal(0.0, 1.0) |&gt; iid(p, k)
@@ -49,7 +50,7 @@ typeof(predictor_joint)</code></pre><pre class="documenter-example-output">SossM
     y ~ For((j-&gt;begin
                     y_dists[j]
                 end), n)
-end),TypeEncoding(Main.ex-example-multinomial-logistic-regression)},Main.ex-example-multinomial-logistic-regression.var&quot;#1#2&quot;,typeof(Soss.dynamicHMC),NamedTuple{(:pool,),Tuple{CategoricalArrays.CategoricalPool{String,UInt8,CategoricalArrays.CategoricalValue{String,UInt8}}}},Symbol},Array{NamedTuple{(:β,),Tuple{Array{Float64,2}}},1},Soss.Model{NamedTuple{(:X, :pool, :β),T} where T&lt;:Tuple,TypeEncoding(begin
+end),TypeEncoding(Main.ex-example-multinomial-logistic-regression)},NamedTuple{(:pool,),Tuple{CategoricalArrays.CategoricalPool{String,UInt8,CategoricalArrays.CategoricalValue{String,UInt8}}}},typeof(Soss.dynamicHMC),Symbol,typeof(SossMLJ.default_transform)},Array{NamedTuple{(:β,),Tuple{Array{Float64,2}}},1},Soss.Model{NamedTuple{(:X, :pool, :β),T} where T&lt;:Tuple,TypeEncoding(begin
     η = X * β
     μ = NNlib.softmax(η; dims = 2)
     y_dists = UnivariateFinite(pool.levels, μ; pool = pool)
@@ -57,24 +58,61 @@ end),TypeEncoding(Main.ex-example-multinomial-logistic-regression)},Main.ex-exam
     y ~ For((j-&gt;begin
                     y_dists[j]
                 end), n)
-end),TypeEncoding(Main.ex-example-multinomial-logistic-regression)},NamedTuple{(:X, :pool),Tuple{Array{Float64,2},CategoricalArrays.CategoricalPool{String,UInt8,CategoricalArrays.CategoricalValue{String,UInt8}}}}}</pre><p>Draw a sample from the posterior:</p><pre><code class="language-julia">single_sample = rand(predictor_joint)</code></pre><pre class="documenter-example-output">150-element Array{CategoricalArrays.CategoricalValue{String,UInt8},1}:
- &quot;versicolor&quot;
- &quot;setosa&quot;
- &quot;versicolor&quot;
+end),TypeEncoding(Main.ex-example-multinomial-logistic-regression)},NamedTuple{(:X, :pool),Tuple{Array{Float64,2},CategoricalArrays.CategoricalPool{String,UInt8,CategoricalArrays.CategoricalValue{String,UInt8}}}}}</pre><p>Draw a single sample from the joint posterior:</p><pre><code class="language-julia">single_sample = rand(predictor_joint)</code></pre><pre class="documenter-example-output">150-element Array{CategoricalArrays.CategoricalValue{String,UInt8},1}:
  &quot;setosa&quot;
  &quot;setosa&quot;
  &quot;setosa&quot;
- &quot;versicolor&quot;
+ &quot;setosa&quot;
+ &quot;setosa&quot;
+ &quot;setosa&quot;
+ &quot;setosa&quot;
  &quot;setosa&quot;
  &quot;setosa&quot;
  &quot;setosa&quot;
  ⋮
- &quot;virginica&quot;
- &quot;virginica&quot;
- &quot;virginica&quot;
- &quot;versicolor&quot;
  &quot;versicolor&quot;
  &quot;virginica&quot;
  &quot;virginica&quot;
  &quot;virginica&quot;
- &quot;virginica&quot;</pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../example-linear-regression/">« Linear regression</a><a class="docs-footer-nextpage" href="../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 28 August 2020 05:07">Friday 28 August 2020</span>. Using Julia version 1.5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ &quot;virginica&quot;
+ &quot;versicolor&quot;
+ &quot;virginica&quot;
+ &quot;virginica&quot;
+ &quot;virginica&quot;</pre><p>For each row in the dataset, construct the marginal posterior predictive distribution</p><pre><code class="language-julia">predictor_marginal = MLJBase.predict(mach, iris[!, feature_columns])</code></pre><pre class="documenter-example-output">150-element MLJBase.UnivariateFiniteArray{ScientificTypes.Multiclass{3},String,UInt8,Float64,1}:
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.981, versicolor=&gt;0.0186, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.952, versicolor=&gt;0.0476, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.973, versicolor=&gt;0.0274, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.951, versicolor=&gt;0.0488, virginica=&gt;0.0002)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.986, versicolor=&gt;0.0144, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.986, versicolor=&gt;0.0144, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.978, versicolor=&gt;0.0216, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.974, versicolor=&gt;0.0264, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.946, versicolor=&gt;0.0536, virginica=&gt;0.0002)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.95, versicolor=&gt;0.0504, virginica=&gt;0.0)
+ ⋮
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.002, versicolor=&gt;0.288, virginica=&gt;0.71)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.0712, virginica=&gt;0.929)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.0494, virginica=&gt;0.951)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0002, versicolor=&gt;0.0464, virginica=&gt;0.953)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0004, versicolor=&gt;0.158, virginica=&gt;0.841)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.177, virginica=&gt;0.823)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.001, versicolor=&gt;0.226, virginica=&gt;0.773)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0006, versicolor=&gt;0.0746, virginica=&gt;0.925)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0014, versicolor=&gt;0.175, virginica=&gt;0.824)</pre><p>predictor_marginal is a <code>Vector</code> of <code>UnivariateFinite</code> distributions</p><pre><code class="language-julia">typeof(predictor_marginal)</code></pre><pre class="documenter-example-output">MLJBase.UnivariateFiniteArray{ScientificTypes.Multiclass{3},String,UInt8,Float64,1}</pre><p><code>predictor_marginal</code> has one element for each row in the data set</p><pre><code class="language-julia">@show size(predictor_marginal); @show size(iris, 1);</code></pre><pre class="documenter-example-output">size(predictor_marginal) = (150,)
+size(iris, 1) = 150</pre><p>Use cross-validation to evaluate the model with respect to the Brier score:</p><pre><code class="language-julia">evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=brier_score, operation=MLJBase.predict)</code></pre><pre class="documenter-example-output">┌──────────────────────────────────────┬───────────────┬────────────────────────────────────┐
+│ _.measure                            │ _.measurement │ _.per_fold                         │
+├──────────────────────────────────────┼───────────────┼────────────────────────────────────┤
+│ BrierScore{MLJBase.UnivariateFinite} │ -0.0949       │ [-0.0872, -0.0665, -0.102, -0.124] │
+└──────────────────────────────────────┴───────────────┴────────────────────────────────────┘
+_.per_observation = [[[-0.00122, -0.000707, ..., -0.0435], [-0.131, -0.00336, ..., -0.199], [-0.0143, -0.00652, ..., -0.0124], [-0.0218, -0.00037, ..., -0.00461]]]
+_.fitted_params_per_fold = [ … ]
+_.report_per_fold = [ … ]
+</pre><p>Use cross-validation to evaluate the model with respect to accuracy:</p><pre><code class="language-julia">evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=accuracy, operation=MLJBase.predict_mode)</code></pre><pre class="documenter-example-output">┌───────────┬───────────────┬────────────────────────────┐
+│ _.measure │ _.measurement │ _.per_fold                 │
+├───────────┼───────────────┼────────────────────────────┤
+│ accuracy  │ 0.954         │ [0.974, 0.895, 0.946, 1.0] │
+└───────────┴───────────────┴────────────────────────────┘
+_.per_observation = [missing]
+_.fitted_params_per_fold = [ … ]
+_.report_per_fold = [ … ]
+</pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../example-linear-regression/">« Linear regression</a><a class="docs-footer-nextpage" href="../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 28 August 2020 10:26">Friday 28 August 2020</span>. Using Julia version 1.5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

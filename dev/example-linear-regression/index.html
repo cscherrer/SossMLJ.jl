@@ -17,31 +17,31 @@ x1 = randn(num_rows)
 x2 = randn(num_rows)
 x3 = Int.(rand(num_rows) .&gt; 0.5)
 x4 = Int.(rand(num_rows) .&gt; 0.5)
-X = (x1 = x1, x2 = x2, x3 = x3, x4 = x4)</code></pre><pre class="documenter-example-output">(x1 = [1.0224150197670603, -0.3981860935244377, -1.53409645971819, 1.7905383086921165, -1.733621089489852, 1.2677953890138853, -1.7532470401880702, 0.9565565737478905, -0.893511260560089, -0.2334049867411954  …  1.3296504241837839, 1.1337168030523515, -0.7771938356257825, 0.4289932690390502, 1.0554907229576305, 0.41368949941142863, 0.019602689367778425, -0.10729456800274181, 1.1810763571585798, -0.024348472600300264],
- x2 = [1.3858233807230258, -0.07777029821046763, 1.295719201084355, -0.3114576577200117, 0.13685917343949033, 0.4648392344104085, 0.12955110327839353, 0.5821054284908672, -1.1240675020472697, 0.5854407079750442  …  0.6371001993492984, -0.29537987927488013, -0.6460227369407875, 0.3670887410770285, -0.5615649629369981, 1.292496650487373, -2.441675098942882, 1.2658133709311534, -0.43494248078617914, 0.011157849379098453],
- x3 = [1, 1, 0, 0, 1, 1, 0, 0, 0, 0  …  1, 0, 0, 1, 1, 0, 1, 1, 0, 1],
- x4 = [1, 1, 0, 1, 0, 1, 0, 1, 0, 1  …  0, 0, 1, 0, 0, 1, 1, 0, 0, 0],)</pre><p>Define the hyperparameters of our prior distributions:</p><pre><code class="language-julia">hyperparams = (s=0.1, t=0.1)</code></pre><pre class="documenter-example-output">(s = 0.1,
- t = 0.1,)</pre><p>Convert the Soss model into a <code>SossMLJModel</code>:</p><pre><code class="language-julia">model = SossMLJModel(m;
+X = (x1 = x1, x2 = x2, x3 = x3, x4 = x4)</code></pre><pre class="documenter-example-output">(x1 = [-0.40221594675316946, 0.667563453548287, -0.9196453882550973, 1.1098040932948376, 0.1785464454104959, 2.265359585873153, 1.8302598011180389, 0.4110455077684598, 1.2485244738515275, 0.3016762257921058  …  -1.279961327125041, 0.03292526170239264, 1.6081415165882433, 0.020135153111957734, -0.3507053021916241, -0.3976675331060706, 0.5140245861016098, 2.2524964414205293, 1.0405551728725064, -0.7370197784387766],
+ x2 = [1.0573067096306799, -1.2166266262276153, 0.10675152506889808, 1.5860342405151096, -1.218399903330426, 0.530035491173876, -0.37644502101521954, -0.4983115333243873, -0.18422944218759152, -0.6141311884177814  …  0.18799255094287157, 1.3179703921646386, -0.19124571378431268, 0.11057466191960319, -0.6046444423085586, -0.07457231655616621, -0.24111887036523968, -2.0067506959887007, -0.4116771640675486, 1.31672753905232],
+ x3 = [0, 1, 1, 1, 0, 0, 0, 0, 0, 0  …  0, 0, 1, 0, 0, 0, 0, 1, 1, 0],
+ x4 = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0  …  1, 0, 0, 0, 0, 1, 1, 1, 0, 1],)</pre><p>Define the hyperparameters of our prior distributions:</p><pre><code class="language-julia">hyperparams = (s=0.1, t=0.1)</code></pre><pre class="documenter-example-output">(s = 0.1,
+ t = 0.1,)</pre><p>Convert the Soss model into a <code>SossMLJModel</code>:</p><pre><code class="language-julia">model = SossMLJModel(;
+    model       = m,
     hyperparams = hyperparams,
-    transform   = X -&gt; (X=matrix(X),),
     infer       = dynamicHMC,
     response    = :y,
 );</code></pre><p>Generate some synthetic labels:</p><pre><code class="language-julia">args = merge(model.transform(X), hyperparams)
 truth = rand(m(args))</code></pre><pre class="documenter-example-output">(p = 4,
- η = [0.20241868649066996, 0.03696121331247093, 0.3043623827469118, -0.1649599300446371, 0.15992214362311993, 0.033870767377030556, 0.12090882202802286, 0.032270221243636266, -0.13824583133621426, 0.10012660075616786  …  0.0706949366153244, -0.11372176811017526, -0.0759333508316545, 0.07628411763947372, -0.11510526121514503, 0.18227484204987118, -0.38366227524114443, 0.2575455313917279, -0.13983836742937208, 0.04214675537991538],
- μ = [0.20241868649066996, 0.03696121331247093, 0.3043623827469118, -0.1649599300446371, 0.15992214362311993, 0.033870767377030556, 0.12090882202802286, 0.032270221243636266, -0.13824583133621426, 0.10012660075616786  …  0.0706949366153244, -0.11372176811017526, -0.0759333508316545, 0.07628411763947372, -0.11510526121514503, 0.18227484204987118, -0.38366227524114443, 0.2575455313917279, -0.13983836742937208, 0.04214675537991538],
- σ = 0.057283239656626864,
- β = [-0.05655329727653713, 0.16794083890049505, 0.03889591038566982, -0.011392624468661832],
- y = [0.24185525796282792, -0.011832264365740676, 0.38854408823060993, -0.1805489064688343, 0.17188369261713915, 0.11412151942284748, 0.10391188385535619, 0.08535623065225542, -0.049514435660774014, 0.13220533473654034  …  0.008924197394644395, -0.07528570084051756, -0.0406067060829839, 0.17625724424322814, -0.09780947475743819, 0.21409800889756872, -0.33199753967196743, 0.22851958239685893, -0.06874350319965258, 0.06998304587142835],)</pre><p>Create an MLJ machine for fitting our model:</p><pre><code class="language-julia">mach = MLJBase.machine(model, X, truth.y)</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{Model{,…},…}} @225[39m trained 0 times.
+ η = [0.04893279258087189, -0.11596849719970195, 0.09968835575857732, -0.03871712785594868, -0.0464786505104712, 0.05545712651424323, -0.07609196766041135, -0.03076446194883566, 0.06721188203142206, -0.030788943843012503  …  0.16744613999837726, 0.0424153136100679, -0.11478858059493983, 0.0029543811154523576, -0.007787841651911046, 0.128084986590211, 0.09087497049891685, -0.08048119970500042, -0.1023354030272671, 0.18587043161490568],
+ μ = [0.04893279258087189, -0.11596849719970195, 0.09968835575857732, -0.03871712785594868, -0.0464786505104712, 0.05545712651424323, -0.07609196766041135, -0.03076446194883566, 0.06721188203142206, -0.030788943843012503  …  0.16744613999837726, 0.0424153136100679, -0.11478858059493983, 0.0029543811154523576, -0.007787841651911046, 0.128084986590211, 0.09087497049891685, -0.08048119970500042, -0.1023354030272671, 0.18587043161490568],
+ σ = 0.12534176711749478,
+ β = [-0.03477651351634138, 0.03305107586456977, -0.052542148812059944, 0.11672019154203217],
+ y = [0.11949280174654758, -0.20580365812035656, 0.07372477876231355, -0.04849313722205961, 0.26844578464653823, 0.16090165388756178, 0.19726358982498785, -0.18268167409923086, -0.23024943064879713, 0.014018709286782446  …  0.33598804475625166, -0.027125964955229516, -0.06680619734031701, -0.10959779982041627, 0.16735395578352474, 0.1421431082072797, 0.08359324869715462, -0.22485006282663647, -0.15682219707304357, -0.1249288202048689],)</pre><p>Create an MLJ machine for fitting our model:</p><pre><code class="language-julia">mach = MLJBase.machine(model, X, truth.y)</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{,…}} @512[39m trained 0 times.
   args: 
-    1:	[34mSource @131[39m ⏎ `ScientificTypes.Table{Union{AbstractArray{ScientificTypes.Continuous,1}, AbstractArray{ScientificTypes.Count,1}}}`
-    2:	[34mSource @631[39m ⏎ `AbstractArray{ScientificTypes.Continuous,1}`
-</pre><p>Fit the machine. This may take several minutes.</p><pre><code class="language-julia">fit!(mach)</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{Model{,…},…}} @225[39m trained 1 time.
+    1:	[34mSource @418[39m ⏎ `ScientificTypes.Table{Union{AbstractArray{ScientificTypes.Continuous,1}, AbstractArray{ScientificTypes.Count,1}}}`
+    2:	[34mSource @847[39m ⏎ `AbstractArray{ScientificTypes.Continuous,1}`
+</pre><p>Fit the machine. This may take several minutes.</p><pre><code class="language-julia">fit!(mach)</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{,…}} @512[39m trained 1 time.
   args: 
-    1:	[34mSource @131[39m ⏎ `ScientificTypes.Table{Union{AbstractArray{ScientificTypes.Continuous,1}, AbstractArray{ScientificTypes.Count,1}}}`
-    2:	[34mSource @631[39m ⏎ `AbstractArray{ScientificTypes.Continuous,1}`
+    1:	[34mSource @418[39m ⏎ `ScientificTypes.Table{Union{AbstractArray{ScientificTypes.Continuous,1}, AbstractArray{ScientificTypes.Count,1}}}`
+    2:	[34mSource @847[39m ⏎ `AbstractArray{ScientificTypes.Continuous,1}`
 </pre><p>Construct the posterior distribution and the joint posterior predictive distribution:</p><pre><code class="language-julia">predictor_joint = predict_joint(mach, X)
-typeof(predictor_joint)</code></pre><pre class="documenter-example-output">SossMLJ.SossMLJPredictor{SossMLJModel{Soss.Model{NamedTuple{(:X, :s, :t),T} where T&lt;:Tuple,TypeEncoding(begin
+typeof(predictor_joint)</code></pre><pre class="documenter-example-output">SossMLJ.SossMLJPredictor{SossMLJModel{SossMLJ.SossMLJPredictor,Soss.Model{NamedTuple{(:X, :s, :t),T} where T&lt;:Tuple,TypeEncoding(begin
     σ ~ HalfNormal(t)
     p = size(X, 2)
     β ~ Normal(0, s) |&gt; iid(p)
@@ -50,86 +50,86 @@ typeof(predictor_joint)</code></pre><pre class="documenter-example-output">SossM
     y ~ For(eachindex(μ)) do j
             Normal(μ[j], σ)
         end
-end),TypeEncoding(Main.ex-example-linear-regression)},Main.ex-example-linear-regression.var&quot;#1#2&quot;,typeof(Soss.dynamicHMC),NamedTuple{(:s, :t),Tuple{Float64,Float64}},Symbol},Array{NamedTuple{(:σ, :β),Tuple{Float64,Array{Float64,1}}},1},Soss.Model{NamedTuple{(:X, :σ, :β),T} where T&lt;:Tuple,TypeEncoding(begin
+end),TypeEncoding(Main.ex-example-linear-regression)},NamedTuple{(:s, :t),Tuple{Float64,Float64}},typeof(Soss.dynamicHMC),Symbol,typeof(SossMLJ.default_transform)},Array{NamedTuple{(:σ, :β),Tuple{Float64,Array{Float64,1}}},1},Soss.Model{NamedTuple{(:X, :σ, :β),T} where T&lt;:Tuple,TypeEncoding(begin
     η = X * β
     μ = η
     y ~ For(eachindex(μ)) do j
             Normal(μ[j], σ)
         end
 end),TypeEncoding(Main.ex-example-linear-regression)},NamedTuple{(:X, :s, :t),Tuple{Array{Float64,2},Float64,Float64}}}</pre><p>Draw a single sample from the joint posterior predictive distribution:</p><pre><code class="language-julia">single_sample = rand(predictor_joint; response = :y)</code></pre><pre class="documenter-example-output">100-element Array{Float64,1}:
-  0.13146770428461108
-  0.046917532963390636
-  0.31995373788611914
- -0.11298334807364988
-  0.18288418157972341
-  0.045668560750056326
-  0.08473351697681407
-  0.08910169915020216
- -0.22332517308194452
-  0.19353594932121687
+  0.14352018060239588
+ -0.026810318285662008
+ -0.07987338772925244
+ -0.21179520269579538
+  0.1005287207785577
+ -0.23392047640326286
+ -0.2443981797971918
+ -0.2291868774458501
+  0.4428750959398585
+ -0.17503304453006543
   ⋮
- -0.13142523313457885
- -0.09910515928966343
-  0.1307998835408542
- -0.04067692302811256
-  0.21902251208984527
- -0.3928505457850609
-  0.31467302766387806
- -0.1393754670505598
- -0.01930082083010811</pre><p>Evaluate the logpdf of the joint posterior predictive distribution at this sample:</p><pre><code class="language-julia">logpdf(predictor_joint, single_sample)</code></pre><pre class="documenter-example-output">157.31934690974217</pre><p>True <code>β</code>:</p><pre><code class="language-julia">truth.β</code></pre><pre class="documenter-example-output">4-element Array{Float64,1}:
- -0.05655329727653713
-  0.16794083890049505
-  0.03889591038566982
- -0.011392624468661832</pre><p>Posterior distribution of <code>β</code></p><pre><code class="language-julia">predict_particles(mach, X; response = :β)</code></pre><pre class="documenter-example-output">4-element Array{MonteCarloMeasurements.Particles{Float64,1000},1}:
- -0.0596 ± 0.0057
-  0.178 ± 0.0057
-  0.0333 ± 0.0084
-  0.000337 ± 0.0084</pre><p>Difference between the posterior distribution of <code>β</code> to the true values:</p><pre><code class="language-julia">truth.β - predict_particles(mach, X; response = :β)</code></pre><pre class="documenter-example-output">4-element Array{MonteCarloMeasurements.Particles{Float64,1000},1}:
-  0.00305 ± 0.0057
- -0.00965 ± 0.0057
-  0.00555 ± 0.0084
- -0.0117 ± 0.0084</pre><p>Compare the joint posterior predictive distribution of <code>μ</code> to the true values:</p><pre><code class="language-julia">truth.μ - predict_particles(mach, X; response = :μ)</code></pre><pre class="documenter-example-output">100-element Array{MonteCarloMeasurements.Particles{Float64,1000},1}:
- -0.0164 ± 0.013
- -0.00664 ± 0.0095
- -0.0172 ± 0.012
- -0.00326 ± 0.014
- -0.00106 ± 0.014
- -0.0068 ± 0.011
- -0.0066 ± 0.01
- -0.0144 ± 0.011
-  0.00812 ± 0.0081
- -0.0181 ± 0.0091
+ -0.03597531857918666
+  0.056343372328785946
+ -0.1604986248845352
+  0.04837897156245871
+  0.2978526751040088
+  0.2916869924095085
+  0.029981393241073545
+  0.05165190329507552
+ -0.23328864646570285</pre><p>Evaluate the logpdf of the joint posterior predictive distribution at this sample:</p><pre><code class="language-julia">logpdf(predictor_joint, single_sample)</code></pre><pre class="documenter-example-output">48.021238779675684</pre><p>True <code>β</code>:</p><pre><code class="language-julia">truth.β</code></pre><pre class="documenter-example-output">4-element Array{Float64,1}:
+ -0.03477651351634138
+  0.03305107586456977
+ -0.052542148812059944
+  0.11672019154203217</pre><p>Posterior distribution of <code>β</code></p><pre><code class="language-julia">predict_particles(mach, X; response = :β)</code></pre><pre class="documenter-example-output">4-element Array{MonteCarloMeasurements.Particles{Float64,1000},1}:
+ -0.0257 ± 0.013
+  0.0329 ± 0.016
+ -0.0292 ± 0.022
+  0.0885 ± 0.024</pre><p>Difference between the posterior distribution of <code>β</code> to the true values:</p><pre><code class="language-julia">truth.β - predict_particles(mach, X; response = :β)</code></pre><pre class="documenter-example-output">4-element Array{MonteCarloMeasurements.Particles{Float64,1000},1}:
+ -0.00909 ± 0.013
+  0.00014 ± 0.016
+ -0.0233 ± 0.022
+  0.0282 ± 0.024</pre><p>Compare the joint posterior predictive distribution of <code>μ</code> to the true values:</p><pre><code class="language-julia">truth.μ - predict_particles(mach, X; response = :μ)</code></pre><pre class="documenter-example-output">100-element Array{MonteCarloMeasurements.Particles{Float64,1000},1}:
+  0.00381 ± 0.018
+ -0.0296 ± 0.028
+  0.0133 ± 0.026
+ -0.0332 ± 0.039
+ -0.00179 ± 0.019
+  0.00771 ± 0.039
+ -0.0167 ± 0.025
+ -0.00381 ± 0.0096
+  0.0169 ± 0.03
+ -0.00283 ± 0.01
   ⋮
-  0.00631 ± 0.0067
- -0.00787 ± 0.01
-  0.00332 ± 0.0087
-  0.0142 ± 0.0097
- -0.0229 ± 0.011
-  0.0174 ± 0.016
- -0.00699 ± 0.012
-  0.0078 ± 0.0073
-  0.00537 ± 0.0084</pre><p>Compare the joint posterior predictive distribution of <code>y</code> to the true values:</p><pre><code class="language-julia">truth.y - predict_particles(mach, X; response = :y)</code></pre><pre class="documenter-example-output">100-element Array{MonteCarloMeasurements.Particles{Float64,1000},1}:
-  0.0232 ± 0.057
- -0.0554 ± 0.056
-  0.0668 ± 0.057
- -0.0188 ± 0.057
-  0.0105 ± 0.056
-  0.0736 ± 0.056
- -0.0234 ± 0.056
-  0.0386 ± 0.056
-  0.0969 ± 0.056
-  0.0141 ± 0.055
+ -0.000114 ± 0.021
+ -0.038 ± 0.03
+ -0.000168 ± 0.0018
+  0.0031 ± 0.011
+  0.0318 ± 0.025
+  0.0235 ± 0.026
+ -0.0159 ± 0.049
+ -0.0329 ± 0.026
+  0.0351 ± 0.03</pre><p>Compare the joint posterior predictive distribution of <code>y</code> to the true values:</p><pre><code class="language-julia">truth.y - predict_particles(mach, X; response = :y)</code></pre><pre class="documenter-example-output">100-element Array{MonteCarloMeasurements.Particles{Float64,1000},1}:
+  0.0749 ± 0.14
+ -0.119 ± 0.14
+ -0.0129 ± 0.14
+ -0.0429 ± 0.14
+  0.313 ± 0.14
+  0.112 ± 0.14
+  0.256 ± 0.14
+ -0.155 ± 0.14
+ -0.281 ± 0.14
+  0.0418 ± 0.14
   ⋮
-  0.0448 ± 0.055
-  0.0277 ± 0.056
-  0.103 ± 0.056
-  0.0314 ± 0.056
-  0.00881 ± 0.056
-  0.0692 ± 0.058
- -0.036 ± 0.057
-  0.0788 ± 0.056
-  0.0333 ± 0.056</pre><p>Construct each of the marginal posterior predictive distributions:</p><pre><code class="language-julia">predictor_marginal = MLJBase.predict(mach, X)
-typeof(predictor_marginal)</code></pre><pre class="documenter-example-output">Array{SossMLJ.SossMLJPredictor{SossMLJModel{Soss.Model{NamedTuple{(:X, :s, :t),T} where T&lt;:Tuple,TypeEncoding(begin
+ -0.07 ± 0.14
+  0.0101 ± 0.14
+ -0.112 ± 0.14
+  0.178 ± 0.14
+  0.0463 ± 0.14
+  0.0158 ± 0.14
+ -0.16 ± 0.15
+ -0.0869 ± 0.14
+ -0.276 ± 0.14</pre><p>Construct each of the marginal posterior predictive distributions:</p><pre><code class="language-julia">predictor_marginal = MLJBase.predict(mach, X)
+typeof(predictor_marginal)</code></pre><pre class="documenter-example-output">Array{SossMLJ.SossMLJPredictor{SossMLJModel{SossMLJ.SossMLJPredictor,Soss.Model{NamedTuple{(:X, :s, :t),T} where T&lt;:Tuple,TypeEncoding(begin
     σ ~ HalfNormal(t)
     p = size(X, 2)
     β ~ Normal(0, s) |&gt; iid(p)
@@ -138,46 +138,46 @@ typeof(predictor_marginal)</code></pre><pre class="documenter-example-output">Ar
     y ~ For(eachindex(μ)) do j
             Normal(μ[j], σ)
         end
-end),TypeEncoding(Main.ex-example-linear-regression)},Main.ex-example-linear-regression.var&quot;#1#2&quot;,typeof(Soss.dynamicHMC),NamedTuple{(:s, :t),Tuple{Float64,Float64}},Symbol},Array{NamedTuple{(:σ, :β),Tuple{Float64,Array{Float64,1}}},1},Soss.Model{NamedTuple{(:X, :σ, :β),T} where T&lt;:Tuple,TypeEncoding(begin
+end),TypeEncoding(Main.ex-example-linear-regression)},NamedTuple{(:s, :t),Tuple{Float64,Float64}},typeof(Soss.dynamicHMC),Symbol,typeof(SossMLJ.default_transform)},Array{NamedTuple{(:σ, :β),Tuple{Float64,Array{Float64,1}}},1},Soss.Model{NamedTuple{(:X, :σ, :β),T} where T&lt;:Tuple,TypeEncoding(begin
     η = X * β
     μ = η
     y ~ For(eachindex(μ)) do j
             Normal(μ[j], σ)
         end
 end),TypeEncoding(Main.ex-example-linear-regression)},NamedTuple{(:X, :s, :t),Tuple{Array{Float64,2},Float64,Float64}}},1}</pre><p><code>predictor_marginal</code> has one element for each row in <code>X</code></p><pre><code class="language-julia">size(predictor_marginal)</code></pre><pre class="documenter-example-output">(100,)</pre><p>Draw a single sample from each of the marginal posterior predictive distributions:</p><pre><code class="language-julia">only.(rand.(predictor_marginal))</code></pre><pre class="documenter-example-output">100-element Array{Float64,1}:
-  0.26072509991294607
- -0.008780912575787177
-  0.25656952931535765
- -0.20735853348542646
-  0.09811810972294448
-  0.0681964921249231
-  0.09489886343434972
-  0.020200514185340867
- -0.10437038761976204
- -0.02273884173418292
+ -0.009121883544122189
+ -0.07080188916588326
+  0.045116401452292273
+  0.3405230333932498
+ -0.0827655681566055
+  0.29042405131656096
+ -0.14182360109305892
+  0.05455581077726547
+  0.0009624119303615567
+  0.034997590129000895
   ⋮
- -0.08800715605763884
- -0.07091418562692164
-  0.01613995260360853
- -0.08687867186003341
-  0.16982964504098327
- -0.48307539027876156
-  0.24238331454357617
- -0.14262614401024606
- -0.012733108727855512</pre><p>Use cross-validation to evaluate the model with respect to the expected value of the root mean square error (RMSE)</p><pre><code class="language-julia">evaluate!(mach, resampling=CV(), measure=rms_expected, operation=predict_particles)</code></pre><pre class="documenter-example-output">┌─────────────┬───────────────┬──────────────────────────────────────────────────┐
-│ _.measure   │ _.measurement │ _.per_fold                                       │
-├─────────────┼───────────────┼──────────────────────────────────────────────────┤
-│ RMSExpected │ 0.0784        │ [0.0784, 0.0775, 0.0818, 0.0831, 0.0719, 0.0779] │
-└─────────────┴───────────────┴──────────────────────────────────────────────────┘
+  0.04122335574156366
+  0.09337676264546693
+ -0.12070514333718878
+ -0.15918042328365356
+  0.1492905374887771
+  0.10547257621737269
+  0.039965757467539026
+ -0.16963904442571137
+  0.05022022323225112</pre><p>Use cross-validation to evaluate the model with respect to the expected value of the root mean square error (RMSE)</p><pre><code class="language-julia">evaluate!(mach, resampling=CV(; nfolds = 6, shuffle = true), measure=rms_expected, operation=predict_particles)</code></pre><pre class="documenter-example-output">┌─────────────┬───────────────┬─────────────────────────────────────────┐
+│ _.measure   │ _.measurement │ _.per_fold                              │
+├─────────────┼───────────────┼─────────────────────────────────────────┤
+│ RMSExpected │ 0.199         │ [0.201, 0.2, 0.196, 0.191, 0.21, 0.193] │
+└─────────────┴───────────────┴─────────────────────────────────────────┘
 _.per_observation = [missing]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]
-</pre><p>Use cross-validation to evaluate the model with respect to the median of the root mean square error (RMSE)</p><pre><code class="language-julia">evaluate!(mach, resampling=CV(), measure=rms_median, operation=predict_particles)</code></pre><pre class="documenter-example-output">┌───────────┬───────────────┬─────────────────────────────────────────────────┐
-│ _.measure │ _.measurement │ _.per_fold                                      │
-├───────────┼───────────────┼─────────────────────────────────────────────────┤
-│ RMSMedian │ 0.078         │ [0.0778, 0.0774, 0.082, 0.0825, 0.0708, 0.0776] │
-└───────────┴───────────────┴─────────────────────────────────────────────────┘
+</pre><p>Use cross-validation to evaluate the model with respect to the median of the root mean square error (RMSE)</p><pre><code class="language-julia">evaluate!(mach, resampling=CV(; nfolds = 6, shuffle = true), measure=rms_median, operation=predict_particles)</code></pre><pre class="documenter-example-output">┌───────────┬───────────────┬────────────────────────────────────────────┐
+│ _.measure │ _.measurement │ _.per_fold                                 │
+├───────────┼───────────────┼────────────────────────────────────────────┤
+│ RMSMedian │ 0.198         │ [0.214, 0.205, 0.191, 0.196, 0.186, 0.197] │
+└───────────┴───────────────┴────────────────────────────────────────────┘
 _.per_observation = [missing]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]
-</pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../example-multinomial-logistic-regression/">Multinomial logistic regression »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 28 August 2020 05:07">Friday 28 August 2020</span>. Using Julia version 1.5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../example-multinomial-logistic-regression/">Multinomial logistic regression »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 28 August 2020 10:26">Friday 28 August 2020</span>. Using Julia version 1.5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
