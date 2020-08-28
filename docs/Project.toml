@@ -11,14 +11,3 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Soss = "8ce77f84-9b61-11e8-39ff-d17a774bf41c"
 SossMLJ = "cf2dc0df-ab57-42da-b773-28c60db69bd5"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-
-
-[compat]
-DataFrames = "0.21"
-Distributions = "0.23"
-Literate = "2"
-MLJBase = "0.14"
-MLJModelInterface = "0.3"
-NNlib = "0.7"
-RDatasets = "0.6"
-Soss = "0.13"
