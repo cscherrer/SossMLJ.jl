@@ -35,7 +35,7 @@ m = @model X, s, t begin
     β ~ Normal(0, s) |> iid(p) # coefficients
     σ ~ HalfNormal(t) # dispersion
     η = X * β # linear predictor
-    μ = η # `μ = g⁻¹(η) = η``
+    μ = η # `μ = g⁻¹(η) = η`
     y ~ For(eachindex(μ)) do j
         Normal(μ[j], σ) # `Yᵢ ~ Normal(mean=μᵢ, variance=σ²)`
     end
