@@ -91,7 +91,7 @@ function MMI.predict_mean(sm::SossMLJModel{<:SossMLJPredictor}, fitresult, Xnew;
 end
 
 function MMI.predict_mode(sm::SossMLJModel{<:MLJBase.UnivariateFinite}, fitresult, Xnew; response = sm.response)
-    marginal_distributions = MMI.predict(sm, fitresult, Xnew; response = sm.response) # `marginal_distributions` is of type `Vector{UnivariateFinite}`
+    marginal_distributions = MMI.predict(sm, fitresult, Xnew; response = sm.response) # `marginal_distributions` is of type `UnivariateFiniteVector`
     modes = [MLJBase.mode(marginal_dist) for marginal_dist in marginal_distributions]
     return modes
 end
