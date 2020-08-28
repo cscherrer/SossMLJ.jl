@@ -57,9 +57,9 @@ hyperparams = (s=0.1, t=0.1)
 
 # Convert the Soss model into a `SossMLJModel`:
 
-model = SossMLJModel(m;
+model = SossMLJModel(;
+    model       = m,
     hyperparams = hyperparams,
-    transform   = X -> (X=matrix(X),),
     infer       = dynamicHMC,
     response    = :y,
 );
@@ -125,8 +125,8 @@ only.(rand.(predictor_marginal))
 
 # Use cross-validation to evaluate the model with respect to the expected value of the root mean square error (RMSE)
 
-evaluate!(mach, resampling=CV(), measure=rms_expected, operation=predict_particles)
+evaluate!(mach, resampling=CV(; nfolds = 6, shuffle = true), measure=rms_expected, operation=predict_particles)
 
 # Use cross-validation to evaluate the model with respect to the median of the root mean square error (RMSE)
 
-evaluate!(mach, resampling=CV(), measure=rms_median, operation=predict_particles)
+evaluate!(mach, resampling=CV(; nfolds = 6, shuffle = true), measure=rms_median, operation=predict_particles)
