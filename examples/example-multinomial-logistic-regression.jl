@@ -22,7 +22,7 @@ using Statistics
 #
 # 1. The probability distribution of `Y`. We assume that each `Yᵢ` follows a multinomial distribution with `k` categories, mean `μᵢ`, and one trial.
 # 2. The systematic component, which consists of linear predictor `η` (eta), which we define as `η := Xβ`, where `β` is the column vector of `p` coefficients.
-# 3. The link function `g`, which provides the following relationship: `g(E[Y]) = g(μ) = η = Xβ`. It follows that `μ = g⁻¹(η)`, where `g⁻¹` denotes the inverse of `g`. Recall that in logistic regression, the canonical link function was the logit function, and the inverse of the logit function was the sigmoidal logistic function. In multinomial logistic regression, the canonical link function is the generalized logit function (which is a generalization of the logit function). The inverse of the generalized logit function is the softmax function (which is a generalization of the sigmoidal logistic function). Therefore, when using the canonical link function, `μ = g⁻¹(η) = softmax(η)`.
+# 3. The link function `g`, which provides the following relationship: `g(E[Y]) = g(μ) = η = Xβ`. It follows that `μ = g⁻¹(η)`, where `g⁻¹` denotes the inverse of `g`. In multinomial logistic regression, the canonical link function is the generalized logit function. The inverse of the generalized logit function is the softmax function. Therefore, when using the canonical link function, `μ = g⁻¹(η) = softmax(η)`.
 
 # A multinomial distribution with one trial is equivalent to the categorical distribution.
 # Therefore, the following two statements are equivalent:
