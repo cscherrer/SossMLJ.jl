@@ -34,7 +34,7 @@ using Statistics
 #
 # In this model, the parameters that we want to estimate are the coefficients `β`.
 # We need to select prior distributions for these parameters. For each `βᵢ`
-# we choose a normal distribution with zero mean and unit variance`. Here, `βᵢ`
+# we choose a normal distribution with zero mean and unit variance. Here, `βᵢ`
 # denotes the `i`th component of `β`.
 
 # We define this model using the Soss probabilistic programming library:
