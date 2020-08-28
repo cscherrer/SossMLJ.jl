@@ -29,14 +29,14 @@ end;</code></pre><p>Import the <em>Iris</em> flower data set:</p><pre><code clas
     transform   = tbl -&gt; (X=MLJBase.matrix(tbl[!, feature_columns]),),
     infer       = dynamicHMC,
     response    = :y,
-);</code></pre><p>Create an MLJ machine for fitting our model:</p><pre><code class="language-julia">mach = MLJBase.machine(model, iris[!, feature_columns], iris[!, :Species])</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{Model{,…},…}} @877[39m trained 0 times.
+);</code></pre><p>Create an MLJ machine for fitting our model:</p><pre><code class="language-julia">mach = MLJBase.machine(model, iris[!, feature_columns], iris[!, :Species])</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{Model{,…},…}} @952[39m trained 0 times.
   args: 
-    1:	[34mSource @284[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
-    2:	[34mSource @846[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
-</pre><p>Fit the machine. This may take several minutes.</p><pre><code class="language-julia">MLJBase.fit!(mach)</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{Model{,…},…}} @877[39m trained 1 time.
+    1:	[34mSource @396[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
+    2:	[34mSource @350[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
+</pre><p>Fit the machine. This may take several minutes.</p><pre><code class="language-julia">MLJBase.fit!(mach)</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{Model{,…},…}} @952[39m trained 1 time.
   args: 
-    1:	[34mSource @284[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
-    2:	[34mSource @846[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
+    1:	[34mSource @396[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
+    2:	[34mSource @350[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
 </pre><p>Construct the posterior:</p><pre><code class="language-julia">predictor_joint = MLJBase.predict_joint(mach, iris[!, feature_columns])
 typeof(predictor_joint)</code></pre><pre class="documenter-example-output">SossMLJ.SossMLJPredictor{SossMLJModel{Soss.Model{NamedTuple{(:X, :pool),T} where T&lt;:Tuple,TypeEncoding(begin
     k = length(pool.levels)
@@ -67,14 +67,14 @@ end),TypeEncoding(Main.ex-example-multinomial-logistic-regression)},NamedTuple{(
  &quot;setosa&quot;
  &quot;setosa&quot;
  &quot;setosa&quot;
- &quot;versicolor&quot;
+ &quot;setosa&quot;
  ⋮
+ &quot;virginica&quot;
+ &quot;virginica&quot;
+ &quot;virginica&quot;
+ &quot;virginica&quot;
  &quot;versicolor&quot;
  &quot;versicolor&quot;
+ &quot;versicolor&quot;
  &quot;virginica&quot;
- &quot;virginica&quot;
- &quot;virginica&quot;
- &quot;virginica&quot;
- &quot;virginica&quot;
- &quot;virginica&quot;
- &quot;virginica&quot;</pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../example-linear-regression/">« Linear regression</a><a class="docs-footer-nextpage" href="../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 28 August 2020 01:03">Friday 28 August 2020</span>. Using Julia version 1.5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ &quot;versicolor&quot;</pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../example-linear-regression/">« Linear regression</a><a class="docs-footer-nextpage" href="../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 28 August 2020 01:43">Friday 28 August 2020</span>. Using Julia version 1.5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
