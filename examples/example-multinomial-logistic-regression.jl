@@ -47,7 +47,7 @@ using Statistics
 # logistic function). Therefore, when using the canonical link function,
 # `μ = g⁻¹(η) = softmax(η)`.
 #
-# In this model, the parameters that we want to estimate are the coefficiens `β`.
+# In this model, the parameters that we want to estimate are the coefficients `β`.
 # We need to select prior distributions for these parameters. For each `βᵢ`
 # we choose a normal distribution with zero mean and unit variance`. Here, `βᵢ`
 # denotes the `i`th component of `β`.
