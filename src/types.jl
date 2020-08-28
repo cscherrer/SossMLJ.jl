@@ -5,19 +5,18 @@ import MLJModelInterface
 const MMI = MLJModelInterface
 
 mutable struct SossMLJModel{M,T,I,H,R} <: MMI.JointProbabilistic
-    model :: M
-    transform :: T
-    infer :: I
-    hyperparams :: H
+    model::M
+    transform::T
+    infer::I
+    hyperparams::H
     response::R
 end
 
 function SossMLJModel(m::Soss.Model;
-    transform = tbl -> (X = MMI.matrix(tbl),),
-    infer = Soss.dynamicHMC,
-    hyperparams = NamedTuple(),
-    response = :y
-    )
+                      transform = tbl -> (X = MMI.matrix(tbl),),
+                      infer = Soss.dynamicHMC,
+                      hyperparams = NamedTuple(),
+                      response = :y)
     return SossMLJModel(m,transform, infer, hyperparams, response)
 end
 
