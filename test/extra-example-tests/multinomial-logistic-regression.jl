@@ -34,5 +34,5 @@ evaluation_results = evaluate!(mach, resampling=CV(; nfolds = nfolds, shuffle = 
 @test evaluation_results.per_fold isa Vector
 @test length(evaluation_results.per_fold) == 1
 @test evaluation_results.per_fold[1] isa Vector
-@test length(evaluation_results.per_fold[1]) == nfolds # make sure that the accuracy is greater than 90% in each fold
-@test all(evaluation_results.per_fold[1] .> 0.9)
+@test length(evaluation_results.per_fold[1]) == nfolds # make sure that the accuracy is greater than 80% in each fold
+@test all(evaluation_results.per_fold[1] .> 0.8)
