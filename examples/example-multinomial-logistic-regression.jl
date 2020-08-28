@@ -20,32 +20,17 @@ using Statistics
 # We define `μ` (mu) as the expected value of `Y`, i.e. `μ := E[Y]`. Our model
 # comprises three components:
 #
-# 1. The probability distribution of `Y`. We assume that each `Yᵢ` follows a
-# multinomial distribution with `k` categories, mean `μᵢ`, and one trial. A multinomial
-# distribution with one trial is equivalent to the categorical distribution.
-# Therefore, these two statements are equivalent:
+# 1. The probability distribution of `Y`. We assume that each `Yᵢ` follows a multinomial distribution with `k` categories, mean `μᵢ`, and one trial.
+# 2. The systematic component, which consists of linear predictor `η` (eta), which we define as `η := Xβ`, where `β` is the column vector of `p` coefficients.
+# 3. The link function `g`, which provides the following relationship: `g(E[Y]) = g(μ) = η = Xβ`. It follows that `μ = g⁻¹(η)`, where `g⁻¹` denotes the inverse of `g`. Recall that in logistic regression, the canonical link function was the logit function, and the inverse of the logit function was the sigmoidal logistic function. In multinomial logistic regression, the canonical link function is the generalized logit function (which is a generalization of the logit function). The inverse of the generalized logit function is the softmax function (which is a generalization of the sigmoidal logistic function). Therefore, when using the canonical link function, `μ = g⁻¹(η) = softmax(η)`.
+
+# A multinomial distribution with one trial is equivalent to the categorical distribution.
+# Therefore, the following two statements are equivalent:
 # - `Yᵢ` follows a multinomial distribution with `k` categories, mean `μᵢ`, and one trial.
 # - `Yᵢ` follows a categorical distribution with `k` categories and mean `μᵢ`.
 #
-# In the special case of two categories, i.e. `k = 2`, the multinomial
-# distribution reduces to the binomial distribution, the categorical
-# distribution reduces to the Bernoulli distribution, and the  multinomial
-# logistic regression model reduces to the logistic regression model.
-#
-# 2. The systematic component, which consists of linear predictor `η` (eta),
-# which we define as `η := Xβ`, where `β` is the column vector of `p`
-# coefficients.
-#
-# 3. The link function `g`, which provides the following relationship:
-# `g(E[Y]) = g(μ) = η = Xβ`. It follows that `μ = g⁻¹(η)`, where `g⁻¹` denotes
-# the inverse of `g`. Recall that in logistic regression, the canonical
-# link function was the logit function, and the inverse of the logit function
-# was the sigmoidal logistic function. In multinomial logistic regression, the
-# canonical link function is the generalized logit function (which is a
-# generalization of the logit function). The inverse of the generalized logit
-# function is the softmax function (which is a generalization of the sigmoidal
-# logistic function). Therefore, when using the canonical link function,
-# `μ = g⁻¹(η) = softmax(η)`.
+# Observe that the logistic regression model is a special case of the
+# multinomial logistic regression model where `k = 2`.
 #
 # In this model, the parameters that we want to estimate are the coefficients `β`.
 # We need to select prior distributions for these parameters. For each `βᵢ`
@@ -86,22 +71,22 @@ label_column = :Species
 
 model = SossMLJModel(m;
     hyperparams = (pool=iris.Species.pool,),
-    transform   = tbl -> (X=MLJBase.matrix(tbl[!, feature_columns]),),
+    transform   = tbl -> (X=MLJBase.matrix(tbl[1:size(tbl, 1), feature_columns]),),
     infer       = dynamicHMC,
     response    = :y,
 );
 
 # Create an MLJ machine for fitting our model:
 
-mach = MLJBase.machine(model, iris[!, feature_columns], iris[!, :Species])
+mach = MLJBase.machine(model, iris[1:size(iris, 1), feature_columns], iris[1:size(iris, 1), :Species])
 
 # Fit the machine. This may take several minutes.
 
 MLJBase.fit!(mach)
 
-# Construct the posterior:
+# Construct the joint posterior:
 
-predictor_joint = MLJBase.predict_joint(mach, iris[!, feature_columns])
+predictor_joint = MLJBase.predict_joint(mach, iris[1:size(iris, 1), feature_columns])
 typeof(predictor_joint)
 
 # Draw a sample from the posterior:
