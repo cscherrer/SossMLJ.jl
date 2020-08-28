@@ -40,8 +40,8 @@ using Statistics
 # We define this model using the Soss probabilistic programming library:
 
 m = @model X,pool begin
-    n = size(X,1) # number of observations
-    p = size(X,2) # number of features
+    n = size(X, 1) # number of observations
+    p = size(X, 2) # number of features
     k = length(pool.levels) # number of classes
     β ~ Normal(0.0, 1.0) |> iid(p, k) # coefficients
     η = X * β # linear predictor
@@ -69,16 +69,17 @@ label_column = :Species
 
 # Convert the Soss model into a `SossMLJModel`:
 
-model = SossMLJModel(m;
+model = SossMLJModel(;
+    model       = m,
+    predictor   = MLJBase.UnivariateFinite,
     hyperparams = (pool=iris.Species.pool,),
-    transform   = tbl -> (X=MLJBase.matrix(tbl[1:size(tbl, 1), feature_columns]),),
     infer       = dynamicHMC,
     response    = :y,
 );
 
 # Create an MLJ machine for fitting our model:
 
-mach = MLJBase.machine(model, iris[1:size(iris, 1), feature_columns], iris[1:size(iris, 1), :Species])
+mach = MLJBase.machine(model, iris[!, feature_columns], iris[!, :Species])
 
 # Fit the machine. This may take several minutes.
 
@@ -86,9 +87,29 @@ MLJBase.fit!(mach)
 
 # Construct the joint posterior:
 
-predictor_joint = MLJBase.predict_joint(mach, iris[1:size(iris, 1), feature_columns])
+predictor_joint = MLJBase.predict_joint(mach, iris[!, feature_columns])
 typeof(predictor_joint)
 
-# Draw a sample from the posterior:
+# Draw a single sample from the joint posterior:
 
 single_sample = rand(predictor_joint)
+
+# For each row in the dataset, construct the marginal posterior predictive distribution
+
+predictor_marginal = MLJBase.predict(mach, iris[!, feature_columns])
+
+# predictor_marginal is a `Vector` of `UnivariateFinite` distributions
+
+typeof(predictor_marginal)
+
+# `predictor_marginal` has one element for each row in the data set
+
+@show size(predictor_marginal); @show size(iris, 1);
+
+# Use cross-validation to evaluate the model with respect to the Brier score:
+
+evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=brier_score, operation=MLJBase.predict)
+
+# Use cross-validation to evaluate the model with respect to accuracy:
+
+evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=accuracy, operation=MLJBase.predict_mode)

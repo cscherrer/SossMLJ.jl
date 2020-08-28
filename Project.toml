@@ -1,6 +1,6 @@
 name = "SossMLJ"
 uuid = "cf2dc0df-ab57-42da-b773-28c60db69bd5"
-authors = ["Chad Scherrer", "Thibaut Lienart", "Dilum Aluthge", "contributors"]
+authors = ["Chad Scherrer", "Thibaut Lienart", "Dilum Aluthge", "Anthony Blaom", "contributors"]
 version = "0.1.0-DEV"
 
 [deps]

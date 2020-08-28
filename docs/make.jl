@@ -30,7 +30,7 @@ makedocs(;
     pages=pages,
     repo="https://github.com/cscherrer/SossMLJ.jl/blob/{commit}{path}#L{line}",
     sitename="SossMLJ.jl",
-    authors="Chad Scherrer, Thibaut Lienart, Dilum Aluthge, and contributors",
+    authors="Chad Scherrer, Thibaut Lienart, Dilum Aluthge, Anthony Blaom, and contributors",
     strict=true,
 )
 
