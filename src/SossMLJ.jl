@@ -6,9 +6,11 @@ import Distributions
 import MLJBase
 import MLJModelInterface
 import MonteCarloMeasurements
-import Soss
 import Statistics
 import Tables
+
+using Reexport
+@reexport using Soss
 
 const MMI = MLJModelInterface
 
