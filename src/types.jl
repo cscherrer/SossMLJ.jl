@@ -2,8 +2,6 @@ import Distributions
 import MLJBase
 import MLJModelInterface
 
-const MMI = MLJModelInterface
-
 struct MixedVariate <: Distributions.VariateForm end
 struct MixedSupport <: Distributions.ValueSupport end
 
@@ -17,7 +15,7 @@ struct SossMLJPredictor{M,PO,PR,A} <: AbstractSossMLJPredictor{M}
     args::A
 end
 
-abstract type AbstractSossMLJModel{P, M} <: MMI.JointProbabilistic
+abstract type AbstractSossMLJModel{P, M} <: MLJModelInterface.JointProbabilistic
 end
 
 mutable struct SossMLJModel{P, M, H, I, R, T} <: AbstractSossMLJModel{P, M}
@@ -32,7 +30,7 @@ mutable struct SossMLJModel{P, M, H, I, R, T} <: AbstractSossMLJModel{P, M}
 end
 
 @inline function default_transform(tbl)
-    return (X = MMI.matrix(tbl),)
+    return (X = MLJModelInterface.matrix(tbl),)
 end
 
 function SossMLJModel(;
@@ -41,7 +39,7 @@ function SossMLJModel(;
                       hyperparams::H = NamedTuple(),
                       infer::I = Soss.dynamicHMC,
                       response::R = :y,
-                      transform::T = default_transform) where P where M where H where I where R where T
+                      transform::T = transform_to_matrix_without_intercept) where P where M where H where I where R where T
     result = SossMLJModel{P, M, H, I, R, T}(
         model,
         hyperparams,

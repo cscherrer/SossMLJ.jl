@@ -6,13 +6,17 @@ import Distributions
 import MLJBase
 import MLJModelInterface
 import MonteCarloMeasurements
+import Reexport
+import Soss
 import Statistics
 import Tables
 
-using Reexport
-@reexport using Soss
-
-const MMI = MLJModelInterface
+# Because we re-export Soss, we need to follow a few rules:
+# 1. In `Project.toml`, the `[compat]` entry for `Soss` should only allow a
+#    single breaking release of Soss at any given time.
+# 2. Whenever we update the `[compat]` entry for `Soss` to a new breaking
+#    release of Soss, we will need to make a breaking release of `SossMLJ`.
+Reexport.@reexport using Soss
 
 export SossMLJModel
 export predict_particles
