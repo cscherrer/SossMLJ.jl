@@ -39,7 +39,7 @@ function SossMLJModel(;
                       hyperparams::H = NamedTuple(),
                       infer::I = Soss.dynamicHMC,
                       response::R = :y,
-                      transform::T = transform_to_matrix_without_intercept) where P where M where H where I where R where T
+                      transform::T = default_transform) where P where M where H where I where R where T
     result = SossMLJModel{P, M, H, I, R, T}(
         model,
         hyperparams,
