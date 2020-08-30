@@ -44,7 +44,7 @@ end;
 # Generate some synthetic features. Let us generate two continuous
 # features and two binary categorical features.
 
-num_rows = 100
+num_rows = 10_000
 x1 = randn(num_rows)
 x2 = randn(num_rows)
 x3 = Int.(rand(num_rows) .> 0.5)
