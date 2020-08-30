@@ -113,3 +113,5 @@ evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=brier_score
 # Use cross-validation to evaluate the model with respect to accuracy:
 
 evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=accuracy, operation=MLJBase.predict_mode)
+
+# The cross-validated accuracy is greater than 90%, which is pretty good!

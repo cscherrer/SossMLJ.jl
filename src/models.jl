@@ -4,9 +4,7 @@ import Soss
 import Statistics
 import NamedTupleTools
 
-const MMI = MLJModelInterface
-
-function MMI.fit(sm::SossMLJModel, verbosity::Integer, X, y, w = nothing)
+function MLJModelInterface.fit(sm::SossMLJModel, verbosity::Integer, X, y, w = nothing)
     # construct the model
     args = merge(sm.transform(X), sm.hyperparams)
 
@@ -27,12 +25,12 @@ function MMI.fit(sm::SossMLJModel, verbosity::Integer, X, y, w = nothing)
     return (fitresult, cache, report)
 end
 
-function MMI.clean!(smm::SossMLJModel)
+function MLJModelInterface.clean!(smm::SossMLJModel)
     warning = ""
     return warning
 end
 
-function MMI.predict(sm::SossMLJModel{<:SossMLJPredictor}, fitresult, Xnew)
+function MLJModelInterface.predict(sm::SossMLJModel{<:SossMLJPredictor}, fitresult, Xnew)
     m = sm.model
     post = fitresult.post
     pred = Soss.predictive(m, keys(post[1])...)
@@ -46,7 +44,7 @@ end
 # This method MUST return a `UnivariateFiniteVector`
 # Currently, this is a hacky and incorrect implementation.
 # TODO: Implement this method correctly.
-function MMI.predict(sm::SossMLJModel{<:MLJBase.UnivariateFinite}, fitresult, Xnew; response = sm.response)
+function MLJModelInterface.predict(sm::SossMLJModel{<:MLJBase.UnivariateFinite}, fitresult, Xnew; response = sm.response)
     return _predict_marginals_incorrectly(sm, fitresult, Xnew; response = sm.response)
 end
 
@@ -57,7 +55,7 @@ end
 # 3. Use these five thousand samples to empirically estimate the probabilities of each class
 # 4. Return a `UnivariateFiniteVector` using these probabilities
 function _predict_marginals_incorrectly(sm::SossMLJModel{<:MLJBase.UnivariateFinite}, fitresult, Xnew; response = sm.response)
-    predictor_joint = MMI.predict_joint(sm, fitresult, Xnew)
+    predictor_joint = MLJModelInterface.predict_joint(sm, fitresult, Xnew)
     num_samples = 5_000
     samples = hcat([rand(predictor_joint; response = response) for sample = 1:num_samples]...)
     pool = sm.hyperparams.pool
@@ -77,7 +75,7 @@ function _predict_marginals_incorrectly(sm::SossMLJModel{<:MLJBase.UnivariateFin
     return marginal_distributions
 end
 
-function MMI.predict_joint(sm::SossMLJModel, fitresult, Xnew)
+function MLJModelInterface.predict_joint(sm::SossMLJModel, fitresult, Xnew)
     m = sm.model
     post = fitresult.post
     pred = Soss.predictive(m, keys(post[1])...)
@@ -85,13 +83,13 @@ function MMI.predict_joint(sm::SossMLJModel, fitresult, Xnew)
     return SossMLJPredictor(sm, post, pred, args)
 end
 
-function MMI.predict_mean(sm::SossMLJModel{<:SossMLJPredictor}, fitresult, Xnew; response = sm.response)
-    predictor_joint = MMI.predict_joint(sm, fitresult, Xnew)
+function MLJModelInterface.predict_mean(sm::SossMLJModel{<:SossMLJPredictor}, fitresult, Xnew; response = sm.response)
+    predictor_joint = MLJModelInterface.predict_joint(sm, fitresult, Xnew)
     return Statistics.mean(getproperty(predict_particles(predictor_joint, Xnew), response))
 end
 
-function MMI.predict_mode(sm::SossMLJModel{<:MLJBase.UnivariateFinite}, fitresult, Xnew; response = sm.response)
-    marginal_distributions = MMI.predict(sm, fitresult, Xnew; response = sm.response) # `marginal_distributions` is of type `UnivariateFiniteVector`
+function MLJModelInterface.predict_mode(sm::SossMLJModel{<:MLJBase.UnivariateFinite}, fitresult, Xnew; response = sm.response)
+    marginal_distributions = MLJModelInterface.predict(sm, fitresult, Xnew; response = sm.response) # `marginal_distributions` is of type `UnivariateFiniteVector`
     modes = [MLJBase.mode(marginal_dist) for marginal_dist in marginal_distributions]
     return modes
 end

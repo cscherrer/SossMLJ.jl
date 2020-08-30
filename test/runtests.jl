@@ -1,6 +1,7 @@
 using SossMLJ
 using Test
 
+import DataFrames
 import Documenter
 import MLJBase
 import Soss
@@ -10,8 +11,15 @@ include("examples-list.jl")
 @testset "SossMLJ.jl" begin
     @testset "Unit tests" begin
         @testset "types.jl" begin
+            @testset "default transform" begin
+                df = DataFrames.DataFrame()
+                df[:a] = [1.0, 2.0, 3.0]
+                df[:b] = [4.0, 5.0, 6.0]
+                @test SossMLJ.default_transform(df) == (X = [1.0 4.0; 2.0 5.0; 3.0 6.0],)
+                @test SossMLJ.default_transform(df).X isa Matrix{Float64}
+            end
             @testset "Constructors for the `SossMLJModel` type" begin
-                let
+                @testset "default response" begin
                     m = Soss.@model begin
                         y ~ Normal()
                         return y
@@ -32,7 +40,7 @@ include("examples-list.jl")
                     @test model.response isa Symbol
                     @test model.response == :y
                 end
-                let
+                @testset "specify response" begin
                     m = Soss.@model begin
                         y ~ Normal()
                         return y
