@@ -15,8 +15,8 @@ include("examples-list.jl")
                 df = DataFrames.DataFrame()
                 df[:a] = [1.0, 2.0, 3.0]
                 df[:b] = [4.0, 5.0, 6.0]
-                @test default_transform(df) == (X = [1.0 4.0; 2.0 5.0; 3.0 6.0],)
-                @test default_transform(df).X isa Matrix{Float64}
+                @test SossMLJ.default_transform(df) == (X = [1.0 4.0; 2.0 5.0; 3.0 6.0],)
+                @test SossMLJ.default_transform(df).X isa Matrix{Float64}
             end
             @testset "Constructors for the `SossMLJModel` type" begin
                 @testset "default response" begin
