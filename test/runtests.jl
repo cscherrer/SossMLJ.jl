@@ -4,6 +4,7 @@ using Test
 import DataFrames
 import Documenter
 import MLJBase
+import MLJModelInterface
 import Soss
 
 include("examples-list.jl")
@@ -39,6 +40,7 @@ include("examples-list.jl")
                     @test model.infer == infer
                     @test model.response isa Symbol
                     @test model.response == :y
+                    @test MLJModelInterface.clean!(model) == ""
                 end
                 @testset "specify response" begin
                     m = Soss.@model begin
