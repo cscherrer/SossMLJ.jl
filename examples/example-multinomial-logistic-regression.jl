@@ -98,7 +98,7 @@ single_sample = rand(predictor_joint)
 
 predictor_marginal = MLJBase.predict(mach, iris[!, feature_columns])
 
-# predictor_marginal is a `Vector` of `UnivariateFinite` distributions
+# predictor_marginal is a `UnivariateFiniteVector`
 
 typeof(predictor_marginal)
 
