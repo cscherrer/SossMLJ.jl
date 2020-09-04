@@ -10,7 +10,6 @@ pages_before_examples = [
 ]
 pages_examples = ["Examples" => ["$(example[1])" => "example-$(example[2]).md" for example in EXAMPLES]]
 pages_after_examples = [
-    "API" => "api.md",
 ]
 pages = vcat(
     pages_before_examples,
