@@ -1,5 +1,3 @@
-__precompile__(false) # TODO: enable precompilation for this package
-
 module SossMLJ
 
 import Distributions
