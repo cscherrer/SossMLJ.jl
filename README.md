@@ -5,9 +5,9 @@
 [![Build Status](https://github.com/cscherrer/SossMLJ.jl/workflows/CI/badge.svg)](https://github.com/cscherrer/SossMLJ.jl/actions)
 [![Coverage](https://codecov.io/gh/cscherrer/SossMLJ.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/cscherrer/SossMLJ.jl)
 
-SossMLJ integrates the [Soss](https://github.com/cscherrer/Soss.jl)
+SossMLJ.jl integrates the [Soss.jl](https://github.com/cscherrer/Soss.jl)
 probabilistic programming library into the
-[MLJ](https://github.com/alan-turing-institute/MLJ.jl) machine learning
+[MLJ.jl](https://github.com/alan-turing-institute/MLJ.jl) machine learning
 framework.
 
 Please see the [documentation](https://cscherrer.github.io/SossMLJ.jl/stable/).
