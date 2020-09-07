@@ -46,8 +46,7 @@ m = @model X,pool begin
     β ~ Normal(0.0, 1.0) |> iid(p, k) # coefficients
     η = X * β # linear predictor
     μ = NNlib.softmax(η; dims=2) # μ = g⁻¹(η) = softmax(η)
-    y_dists = UnivariateFinite(pool.levels, μ; pool=pool) # `UnivariateFinite` is mathematically equivalent to `Categorical`
-    y ~ For(j -> y_dists[j], n) # `Yᵢ ~ UnivariateFinite(mean=μᵢ, categories=k)`, which is mathematically equivalent to `Yᵢ ~ Categorical(mean=μᵢ, categories=k)`
+    y .~ UnivariateFinite(pool.levels, μ; pool=pool) # `Yᵢ ~ UnivariateFinite(mean=μᵢ, categories=k)`, which is mathematically equivalent to `Yᵢ ~ Categorical(mean=μᵢ, categories=k)`
 end;
 
 # Import the *Iris* flower data set:
