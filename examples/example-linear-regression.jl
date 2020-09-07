@@ -36,9 +36,7 @@ m = @model X, s, t begin
     σ ~ HalfNormal(t) # dispersion
     η = X * β # linear predictor
     μ = η # `μ = g⁻¹(η) = η`
-    y ~ For(eachindex(μ)) do j
-        Normal(μ[j], σ) # `Yᵢ ~ Normal(mean=μᵢ, variance=σ²)`
-    end
+    y .~ Normal.(μ,σ) # `Yᵢ ~ Normal(mean=μᵢ, variance=σ²)`
 end;
 
 # Generate some synthetic features. Let us generate two continuous
