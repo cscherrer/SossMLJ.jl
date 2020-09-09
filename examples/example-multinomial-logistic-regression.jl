@@ -49,7 +49,7 @@ m = @model X,pool begin
     y .~ UnivariateFinite(pool.levels, μ; pool=pool) # `Yᵢ ~ UnivariateFinite(mean=μᵢ, categories=k)`, which is mathematically equivalent to `Yᵢ ~ Categorical(mean=μᵢ, categories=k)`
 end;
 
-# Import the *Iris* flower data set:
+# Import the Iris flower data set:
 
 iris = dataset("datasets", "iris");
 
