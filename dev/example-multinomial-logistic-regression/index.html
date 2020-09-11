@@ -30,14 +30,14 @@ end;</code></pre><p>Import the Iris flower data set:</p><pre><code class="langua
     hyperparams = (pool=iris.Species.pool,),
     infer       = dynamicHMC,
     response    = :y,
-);</code></pre><p>Create an MLJ machine for fitting our model:</p><pre><code class="language-julia">mach = MLJBase.machine(model, iris[!, feature_columns], iris[!, :Species])</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{,…}} @184[39m trained 0 times.
+);</code></pre><p>Create an MLJ machine for fitting our model:</p><pre><code class="language-julia">mach = MLJBase.machine(model, iris[!, feature_columns], iris[!, :Species])</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{,…}} @072[39m trained 0 times.
   args: 
-    1:	[34mSource @713[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
-    2:	[34mSource @619[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
-</pre><p>Fit the machine. This may take several minutes.</p><pre><code class="language-julia">MLJBase.fit!(mach)</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{,…}} @184[39m trained 1 time.
+    1:	[34mSource @697[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
+    2:	[34mSource @857[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
+</pre><p>Fit the machine. This may take several minutes.</p><pre><code class="language-julia">MLJBase.fit!(mach)</code></pre><pre class="documenter-example-output">[34mMachine{SossMLJModel{,…}} @072[39m trained 1 time.
   args: 
-    1:	[34mSource @713[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
-    2:	[34mSource @619[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
+    1:	[34mSource @697[39m ⏎ `ScientificTypes.Table{AbstractArray{ScientificTypes.Continuous,1}}`
+    2:	[34mSource @857[39m ⏎ `AbstractArray{ScientificTypes.Multiclass{3},1}`
 </pre><p>Construct the joint posterior:</p><pre><code class="language-julia">predictor_joint = MLJBase.predict_joint(mach, iris[!, feature_columns])
 typeof(predictor_joint)</code></pre><pre class="documenter-example-output">SossMLJ.SossMLJPredictor{SossMLJModel{MLJBase.UnivariateFinite,Model{NamedTuple{(:X, :pool),T} where T&lt;:Tuple,TypeEncoding(begin
     k = length(pool.levels)
@@ -62,57 +62,57 @@ end),TypeEncoding(Main.ex-example-multinomial-logistic-regression)},NamedTuple{(
  &quot;setosa&quot;
  &quot;setosa&quot;
  &quot;setosa&quot;
+ &quot;versicolor&quot;
  &quot;setosa&quot;
  &quot;setosa&quot;
  &quot;setosa&quot;
- &quot;setosa&quot;
- &quot;setosa&quot;
- &quot;setosa&quot;
+ &quot;versicolor&quot;
+ &quot;versicolor&quot;
  &quot;setosa&quot;
  ⋮
  &quot;virginica&quot;
  &quot;virginica&quot;
+ &quot;versicolor&quot;
  &quot;virginica&quot;
  &quot;virginica&quot;
- &quot;virginica&quot;
- &quot;virginica&quot;
+ &quot;versicolor&quot;
  &quot;virginica&quot;
  &quot;virginica&quot;
  &quot;virginica&quot;</pre><p>For each row in the dataset, construct the marginal posterior predictive distribution</p><pre><code class="language-julia">predictor_marginal = MLJBase.predict(mach, iris[!, feature_columns])</code></pre><pre class="documenter-example-output">150-element MLJBase.UnivariateFiniteArray{ScientificTypes.Multiclass{3},String,UInt8,Float64,1}:
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.982, versicolor=&gt;0.0184, virginica=&gt;0.0)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.952, versicolor=&gt;0.0478, virginica=&gt;0.0)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.967, versicolor=&gt;0.033, virginica=&gt;0.0)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.949, versicolor=&gt;0.0514, virginica=&gt;0.0)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.986, versicolor=&gt;0.014, virginica=&gt;0.0)
  UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.982, versicolor=&gt;0.0178, virginica=&gt;0.0)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.973, versicolor=&gt;0.0266, virginica=&gt;0.0)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.972, versicolor=&gt;0.0276, virginica=&gt;0.0)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.939, versicolor=&gt;0.0612, virginica=&gt;0.0)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.948, versicolor=&gt;0.0516, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.953, versicolor=&gt;0.0472, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.971, versicolor=&gt;0.0286, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.953, versicolor=&gt;0.0466, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.985, versicolor=&gt;0.015, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.982, versicolor=&gt;0.0178, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.97, versicolor=&gt;0.0296, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.969, versicolor=&gt;0.0314, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.94, versicolor=&gt;0.0604, virginica=&gt;0.0)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.946, versicolor=&gt;0.054, virginica=&gt;0.0)
  ⋮
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.002, versicolor=&gt;0.287, virginica=&gt;0.711)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0004, versicolor=&gt;0.0712, virginica=&gt;0.928)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.0544, virginica=&gt;0.946)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.0478, virginica=&gt;0.952)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.001, versicolor=&gt;0.147, virginica=&gt;0.852)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0004, versicolor=&gt;0.187, virginica=&gt;0.812)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.001, versicolor=&gt;0.244, virginica=&gt;0.755)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0006, versicolor=&gt;0.0816, virginica=&gt;0.918)
- UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0008, versicolor=&gt;0.178, virginica=&gt;0.821)</pre><p>predictor_marginal is a <code>UnivariateFiniteVector</code></p><pre><code class="language-julia">typeof(predictor_marginal)</code></pre><pre class="documenter-example-output">MLJBase.UnivariateFiniteArray{ScientificTypes.Multiclass{3},String,UInt8,Float64,1}</pre><p><code>predictor_marginal</code> has one element for each row in the data set</p><pre><code class="language-julia">@show size(predictor_marginal); @show size(iris, 1);</code></pre><pre class="documenter-example-output">size(predictor_marginal) = (150,)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0022, versicolor=&gt;0.294, virginica=&gt;0.704)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0002, versicolor=&gt;0.076, virginica=&gt;0.924)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0002, versicolor=&gt;0.0528, virginica=&gt;0.947)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0002, versicolor=&gt;0.0484, virginica=&gt;0.951)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0008, versicolor=&gt;0.162, virginica=&gt;0.837)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0012, versicolor=&gt;0.167, virginica=&gt;0.831)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0004, versicolor=&gt;0.215, virginica=&gt;0.785)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0006, versicolor=&gt;0.0798, virginica=&gt;0.92)
+ UnivariateFinite{ScientificTypes.Multiclass{3}}(setosa=&gt;0.0002, versicolor=&gt;0.181, virginica=&gt;0.819)</pre><p>predictor_marginal is a <code>UnivariateFiniteVector</code></p><pre><code class="language-julia">typeof(predictor_marginal)</code></pre><pre class="documenter-example-output">MLJBase.UnivariateFiniteArray{ScientificTypes.Multiclass{3},String,UInt8,Float64,1}</pre><p><code>predictor_marginal</code> has one element for each row in the data set</p><pre><code class="language-julia">@show size(predictor_marginal); @show size(iris, 1);</code></pre><pre class="documenter-example-output">size(predictor_marginal) = (150,)
 size(iris, 1) = 150</pre><p>Use cross-validation to evaluate the model with respect to the Brier score:</p><pre><code class="language-julia">evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=brier_score, operation=MLJBase.predict)</code></pre><pre class="documenter-example-output">┌──────────────────────────────────────┬───────────────┬────────────────────────────────────┐
 │ _.measure                            │ _.measurement │ _.per_fold                         │
 ├──────────────────────────────────────┼───────────────┼────────────────────────────────────┤
-│ BrierScore{MLJBase.UnivariateFinite} │ -0.0915       │ [-0.0799, -0.0478, -0.103, -0.135] │
+│ BrierScore{MLJBase.UnivariateFinite} │ -0.0901       │ [-0.0879, -0.106, -0.0587, -0.108] │
 └──────────────────────────────────────┴───────────────┴────────────────────────────────────┘
-_.per_observation = [[[-0.00952, -0.507, ..., -0.000986], [-0.0989, -0.00157, ..., -0.0832], [-0.0152, -0.0008, ..., -0.075], [-0.0106, -0.00248, ..., -0.0661]]]
+_.per_observation = [[[-0.0666, -0.0261, ..., -0.0692], [-0.00892, -0.0374, ..., -0.0249], [-0.00304, -0.000104, ..., -0.0771], [-0.0315, -0.00761, ..., -0.531]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]
-</pre><p>Use cross-validation to evaluate the model with respect to accuracy:</p><pre><code class="language-julia">evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=accuracy, operation=MLJBase.predict_mode)</code></pre><pre class="documenter-example-output">┌───────────┬───────────────┬────────────────────────────┐
-│ _.measure │ _.measurement │ _.per_fold                 │
-├───────────┼───────────────┼────────────────────────────┤
-│ accuracy  │ 0.967         │ [0.947, 1.0, 0.946, 0.973] │
-└───────────┴───────────────┴────────────────────────────┘
+</pre><p>Use cross-validation to evaluate the model with respect to accuracy:</p><pre><code class="language-julia">evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=accuracy, operation=MLJBase.predict_mode)</code></pre><pre class="documenter-example-output">┌───────────┬───────────────┬──────────────────────────────┐
+│ _.measure │ _.measurement │ _.per_fold                   │
+├───────────┼───────────────┼──────────────────────────────┤
+│ accuracy  │ 0.954         │ [0.947, 0.921, 0.973, 0.973] │
+└───────────┴───────────────┴──────────────────────────────┘
 _.per_observation = [missing]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]
-</pre><p>The cross-validated accuracy is greater than 90%, which is pretty good!</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../example-linear-regression/">« Linear regression</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 9 September 2020 08:39">Wednesday 9 September 2020</span>. Using Julia version 1.5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</pre><p>The cross-validated accuracy is greater than 90%, which is pretty good!</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../example-linear-regression/">« Linear regression</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 11 September 2020 18:20">Friday 11 September 2020</span>. Using Julia version 1.5.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
