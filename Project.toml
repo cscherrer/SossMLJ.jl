@@ -27,7 +27,7 @@ NNlib = "0.7"
 NamedTupleTools = "0.13"
 RDatasets = "0.6"
 Reexport = "0.2"
-Soss = "0.14, 0.15"
+Soss = "0.15"
 Tables = "1"
 julia = "1.4"
 
