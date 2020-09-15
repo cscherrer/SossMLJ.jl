@@ -1,7 +1,7 @@
 name = "SossMLJ"
 uuid = "cf2dc0df-ab57-42da-b773-28c60db69bd5"
 authors = ["Chad Scherrer", "Thibaut Lienart", "Dilum Aluthge", "Anthony Blaom", "contributors"]
-version = "0.1.0-DEV"
+version = "0.1.0"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
