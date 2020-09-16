@@ -1,6 +1,7 @@
 import Distributions
 import MLJBase
 import MLJModelInterface
+import MonteCarloMeasurements
 
 struct MixedVariate <: Distributions.VariateForm end
 struct MixedSupport <: Distributions.ValueSupport end
@@ -18,7 +19,7 @@ end
 abstract type AbstractSossMLJModel{P, M} <: MLJModelInterface.JointProbabilistic
 end
 
-mutable struct SossMLJModel{P, M, H, I, R, T} <: AbstractSossMLJModel{P, M}
+mutable struct SossMLJModel{P, M, H, I, R, RF, RP, T} <: AbstractSossMLJModel{P, M}
     # the first type parameter P is for the predictor_type
     # then we do the model, which is of type M
     model::M
@@ -26,6 +27,8 @@ mutable struct SossMLJModel{P, M, H, I, R, T} <: AbstractSossMLJModel{P, M}
     hyperparams::H
     infer::I
     response::R
+    response_fit::RF
+    response_predict::RP
     transform::T
 end
 
@@ -39,17 +42,19 @@ function SossMLJModel(;
                       hyperparams::H = NamedTuple(),
                       infer::I = Soss.dynamicHMC,
                       response::R = :y,
-                      transform::T = default_transform) where P where M where H where I where R where T
-    result = SossMLJModel{P, M, H, I, R, T}(
+                      response_fit::RF = response,
+                      response_predict::RP = response,
+                      transform::T = default_transform) where P where M where H where I where R where RF where RP where T
+    result = SossMLJModel{P, M, H, I, R, RF, RP, T}(
         model,
         hyperparams,
         infer,
         response,
+        response_fit,
+        response_predict,
         transform,
     )
     return result
 end
 
-struct RMSDistribution <: MLJBase.Measure end
-struct RMSExpected <: MLJBase.Measure end
-struct RMSMedian <: MLJBase.Measure end
+const ParticleMatrix = AbstractMatrix{<:MonteCarloMeasurements.AbstractParticles}

@@ -2,6 +2,7 @@
 
 # Import the necessary packages:
 
+using CategoricalArrays
 using DataFrames
 using Distributions
 using MLJBase
@@ -52,7 +53,7 @@ end;
 
 # Import the Iris flower data set:
 
-iris = dataset("datasets", "iris");
+iris = dataset("datasets", "iris") |> DataFrame;
 
 # Define our feature columns:
 
@@ -72,7 +73,7 @@ label_column = :Species
 model = SossMLJModel(;
     model       = m,
     predictor   = MLJBase.UnivariateFinite,
-    hyperparams = (pool=iris.Species.pool,),
+    hyperparams = (pool=CategoricalArrays.pool(iris.Species),),
     infer       = dynamicHMC,
     response    = :y,
 );
@@ -106,9 +107,9 @@ typeof(predictor_marginal)
 
 @show size(predictor_marginal); @show size(iris, 1);
 
-# Use cross-validation to evaluate the model with respect to the Brier score:
+# Use cross-validation to evaluate the model with respect to the expected value of the Brier score:
 
-evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=brier_score, operation=MLJBase.predict)
+evaluate!(mach, resampling=CV(; nfolds = 4, shuffle = true), measure=brier_score_expected, operation=predict_particles(:μ))
 
 # Use cross-validation to evaluate the model with respect to accuracy:
 

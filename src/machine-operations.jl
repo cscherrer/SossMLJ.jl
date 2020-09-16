@@ -1,6 +1,6 @@
 import MLJBase
 
-const OPERATIONS = (:predict_particles,)
+const OPERATIONS = (:predict_particles, :_predict_all_particles)
 
 for operation in OPERATIONS
     ex = quote
