@@ -25,7 +25,7 @@ MonteCarloMeasurements = "0.9"
 NNlib = "0.7"
 NamedTupleTools = "0.13"
 RDatasets = "0.6"
-Soss = "0.15"
+Soss = "0.15, 0.16"
 Tables = "1"
 julia = "1.4"
 
