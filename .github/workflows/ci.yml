@@ -7,8 +7,6 @@ on:
     branches:
       - master
     tags: '*'
-  schedule:
-    - cron: '33 16 17 * *' # run the cron job once per month
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
@@ -17,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.4'
+          - '1.5'
           - '1'
           - 'nightly'
         os:
