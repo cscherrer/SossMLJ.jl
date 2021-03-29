@@ -1,7 +1,5 @@
 name: VersionVigilante
-
 on: pull_request
-
 jobs:
   VersionVigilante:
     runs-on: ubuntu-latest
