@@ -1,7 +1,7 @@
 name = "SossMLJ"
 uuid = "cf2dc0df-ab57-42da-b773-28c60db69bd5"
 authors = ["Chad Scherrer", "Thibaut Lienart", "Dilum Aluthge", "Anthony Blaom", "contributors"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
@@ -27,7 +27,7 @@ NamedTupleTools = "0.13"
 RDatasets = "0.6"
 Soss = "0.15"
 Tables = "1"
-julia = "1.5"
+julia = "1.6"
 
 [extras]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
