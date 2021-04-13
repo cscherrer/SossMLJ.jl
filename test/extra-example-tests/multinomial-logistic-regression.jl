@@ -1,3 +1,9 @@
+import CategoricalArrays
+import MLJBase
+import MonteCarloMeasurements
+import SossMLJ
+import Statistics
+
 samples = hcat([rand(predictor_joint) for sample = 1:1_000]...)
 modes = [mode(samples[i, :]) for i = 1:size(samples, 1)]
 overall_accuracy = Statistics.mean(modes .== iris[!, label_column])
@@ -36,3 +42,19 @@ evaluation_results = evaluate!(mach, resampling=CV(; nfolds = nfolds, shuffle = 
 @test evaluation_results.per_fold[1] isa Vector
 @test length(evaluation_results.per_fold[1]) == nfolds # make sure that the accuracy is greater than 80% in each fold
 @test all(evaluation_results.per_fold[1] .> 0.8)
+
+# Now, we test the correctness of our Brier score particle implementation by
+# comparing it to the non-particle implementation in MLJBase.
+let
+    y = iris[!, :Species]
+    μ̂ = SossMLJ.predict_particles(:μ)(mach, iris[!, feature_columns])
+    pool = CategoricalArrays.pool(y)
+    μ̂_dists = MLJBase.UnivariateFinite(pool.levels, Statistics.mean.(μ̂); pool=pool)
+    mljbase_brier_score = MLJBase.BrierScore()(μ̂_dists, y)
+    μ̂_mean = [MonteCarloMeasurements.Particles([Statistics.mean(element)]) for element in μ̂]
+    sossmlj_brier_score_μ̂_mean = SossMLJ.BrierScoreDistribution()(μ̂_mean, y)
+    @test all(mljbase_brier_score .≈ only.(getproperty.(sossmlj_brier_score_μ̂_mean, :particles)))
+    @test all(mljbase_brier_score .≈ Statistics.mean.(sossmlj_brier_score_μ̂_mean))
+    sossmlj_brier_score = SossMLJ.BrierScoreDistribution()(μ̂, y)
+    @test all(abs.(mljbase_brier_score .- Statistics.mean.(sossmlj_brier_score)) .< 0.1)
+end
