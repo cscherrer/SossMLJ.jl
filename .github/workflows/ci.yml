@@ -61,7 +61,7 @@ jobs:
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
-        run: |
+      - run: |
           julia --project=docs -e '
             using Documenter: doctest
             using SossMLJ
