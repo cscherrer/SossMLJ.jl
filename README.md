@@ -1,4 +1,4 @@
-# SossMLJ
+# SossMLJ 
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://cscherrer.github.io/SossMLJ.jl/stable/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://cscherrer.github.io/SossMLJ.jl/dev/)
