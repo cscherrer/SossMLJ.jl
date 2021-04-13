@@ -1,20 +1,6 @@
 import MLJModelInterface
 import Soss
 
-function _predict_all_particles(predictor::SossMLJPredictor, Xnew)
-    args = predictor.args
-    pars = Soss.particles(predictor.post)
-    pred = predictor.pred
-    transform = predictor.model.transform
-    dist = pred(merge(args, transform(Xnew), pars))
-    return Soss.particles(dist)
-end
-
-function _predict_all_particles(sm::SossMLJModel, fitresult, Xnew)
-    predictor_joint = MLJModelInterface.predict_joint(sm, fitresult, Xnew)
-    return predict_particles(predictor_joint, Xnew)
-end
-
 function predict_particles(response::Symbol)
     function _predict_particles(varargs...; kwargs...)
         if :response in keys(kwargs)
